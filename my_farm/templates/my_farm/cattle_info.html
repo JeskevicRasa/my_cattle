@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cattle info</title>
+</head>
+<body>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+<h1> Cattle info </h1>
+
+
+<table style="width:80%">
+  <thead>
+    <tr style="background-color:6F625F;">
+      <th>Type</th>
+      <th>Number</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Breed</th>
+      <th>Birth date</th>
+      <th>Entry date</th>
+      <th>End date</th>
+      <th>Comments</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td>{{ row.type }}</td>
+      <td>{{ row.number }}</td>
+      <td>{{ row.name }}</td>
+      <td>{{ row.gender }}</td>
+      <td>{{ row.breed }}</td>
+      <td>{{ row.birth_date|date:"Y-m-d" }}</td>
+      <td>{{ row.entry_date|date:"Y-m-d" }}</td>
+      <td>{{ row.end_date|date:"Y-m-d" }}</td>
+      <td>{{ row.comments }}</td>
+      <td>
+        <a href="{% url 'my_farm:delete_row' row.id %}">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'my_farm:add_row' %}">Add row</a>
+</body>
+</html>

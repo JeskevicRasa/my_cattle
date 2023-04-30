@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delete Row</title>
+</head>
+<body>
+  <h1>Delete Row</h1>
+  <p>Are you sure you want to delete the row with ID {{ row.id }} and name "{{ row.name }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete it</button>
+  </form>
+</body>
+</html>

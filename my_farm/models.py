@@ -13,14 +13,30 @@ class Cattle(models.Model):
         ('Female', 'Female'),
         ('Male', 'Male'),
     ]
+
+    ACQUISITION_METHOD = [
+        ('Birth', 'Birth'),
+        ('Purchase', 'Purchase'),
+        ('Gift', 'Gift'),
+    ]
+
+    LOSS_METHOD = [
+        ('Death', 'Death'),
+        ('Sold', 'Sold'),
+        ('Consumed', 'Consumed'),
+        ('Gifted', 'Gifted'),
+    ]
+
     type = models.CharField(max_length=80, blank=False)
     number = models.CharField(max_length=80, blank=False, unique=True)
     name = models.CharField(max_length=80, blank=False)
     gender = models.CharField(choices=GENDER, max_length=80, blank=False)
     breed = models.CharField(max_length=80, blank=False)
     birth_date = models.DateField()
+    acquisition_method = models.CharField(choices=ACQUISITION_METHOD, max_length=80, blank=True, null=True)
     entry_date = models.DateField()
-    end_date = models.DateField()
+    loss_method = models.CharField(choices=LOSS_METHOD, max_length=80, blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     comments = models.TextField(max_length=2000)
 
     class Meta:

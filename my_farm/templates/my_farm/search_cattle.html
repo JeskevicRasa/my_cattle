@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Cattle</title>
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Cattle</h1>
+
+    <form method="GET" action="{% url 'my_farm:search_cattle' %}">
+        <input type="text" name="query" value="{{ query }}" placeholder="Search by name">
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Search Results:</h2>
+    <table id="cattle-table" style="width:80%">
+        <thead>
+            <tr style="background-color:6F625F;">
+              <th class="cattle-type">Type</th>
+              <th class="cattle-number">Number</th>
+              <th class="cattle-name">Name</th>
+              <th class="cattle-gender">Gender</th>
+              <th class="cattle-breed">Breed</th>
+              <th class="cattle-birth_date">Birth date</th>
+              <th class="cattle-acquisition_method">Acquisition method</th>
+              <th class="cattle-entry_date">Entry date</th>
+              <th class="cattle-loss_method">Loss method</th>
+              <th class="cattle-end_date">End date</th>
+              <th class="cattle-comments">Comments</th>
+            </tr>
+          </thead>
+
+    </thead>
+        <tbody>
+            {% for cattle in cattle_list %}
+            <tr>
+                <td>{{ cattle.type }}</td>
+                <td>{{ cattle.number }}</td>
+                <td>{{ cattle.name }}</td>
+                <td>{{ cattle.gender }}</td>
+                <td>{{ cattle.breed }}</td>
+                <td>{{ cattle.birth_date|date:"Y-m-d" }}</td>
+                <td>{{ cattle.acquisition_method }}</td>
+                <td>{{ cattle.entry_date|date:"Y-m-d" }}</td>
+                <td>{{ cattle.loss_method }}</td>
+                <td>{{ cattle.end_date|date:"Y-m-d" }}</td>
+                <td>{{ cattle.comments }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No cattle found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

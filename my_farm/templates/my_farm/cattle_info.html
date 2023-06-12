@@ -6,53 +6,155 @@
 <head>
     <meta charset="UTF-8">
     <title>Cattle info</title>
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
 </head>
 <body>
-<style>
-table, th, td {
-  border:1px solid black;
-}
-</style>
-<h1> Cattle info </h1>
 
+<h1 style="text-align: center;">Cattle info</h1>
 
-<table style="width:80%">
-  <thead>
-    <tr style="background-color:6F625F;">
-      <th>Type</th>
-      <th>Number</th>
-      <th>Name</th>
-      <th>Gender</th>
-      <th>Breed</th>
-      <th>Birth date</th>
-      <th>Entry date</th>
-      <th>End date</th>
-      <th>Comments</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in rows %}
-    <tr>
-      <td>{{ row.type }}</td>
-      <td>{{ row.number }}</td>
-      <td>{{ row.name }}</td>
-      <td>{{ row.gender }}</td>
-      <td>{{ row.breed }}</td>
-      <td>{{ row.birth_date|date:"Y-m-d" }}</td>
-      <td>{{ row.entry_date|date:"Y-m-d" }}</td>
-      <td>{{ row.end_date|date:"Y-m-d" }}</td>
-      <td>{{ row.comments }}</td>
-      <td>
-        <a href="{% url 'my_farm:delete_row' row.id %}">Delete</a>
-      </td>
-    </tr>
+    <!-- Search Tool -->
+    <form method="GET" action="{% url 'my_farm:search_cattle' %}">
+        <input type="text" name="query" placeholder="Search...">
+        <button type="submit">Search</button>
+    </form>
+
+    <p></p>
+
+    <form method="POST" action="{% url 'my_farm:add_row' %}">
+        {% csrf_token %}
+        <button type="submit">Add cattle information</button>
+    </form>
+<p>Select the columns you want to see:</p>
+<form id="column-form">
+    {% csrf_token %}
+    <label for="id_type">Type</label>
+    <input type="checkbox" name="columns" value="type" id="id_type" checked>
+    <label for="id_number">Number</label>
+    <input type="checkbox" name="columns" value="number" id="id_number" checked>
+    <label for="id_name">Name</label>
+    <input type="checkbox" name="columns" value="name" id="id_name" checked>
+    <label for="id_gender">Gender</label>
+    <input type="checkbox" name="columns" value="gender" id="id_gender" checked>
+    <label for="id_breed">Breed</label>
+    <input type="checkbox" name="columns" value="breed" id="id_breed" checked>
+    <label for="id_birth_date">Birth Date</label>
+    <input type="checkbox" name="columns" value="birth_date" id="id_birth_date" checked>
+    <label for="id_acquisition_method">Acquisition method</label>
+    <input type="checkbox" name="columns" value="acquisition_method" id="id_acquisition_method" checked>
+    <label for="id_entry_date">Entry date</label>
+    <input type="checkbox" name="columns" value="entry_date" id="id_entry_date" checked>
+    <label for="id_loss_method">Loss method</label>
+    <input type="checkbox" name="columns" value="loss_method" id="id_loss_method" checked>
+    <label for="id_end_date">End date</label>
+    <input type="checkbox" name="columns" value="end_date" id="id_end_date" checked>
+    <label for="id_comments">Comments</label>
+    <input type="checkbox" name="columns" value="comments" id="id_comments" checked>
+    <button type="submit">Apply</button>
+</form>
+  <table id="cattle-table" style="width:80%">
+      <thead>
+        <tr style="background-color:6F625F;">
+          <th class="cattle-type">Type</th>
+          <th class="cattle-number">Number</th>
+          <th class="cattle-name">Name</th>
+          <th class="cattle-gender">Gender</th>
+          <th class="cattle-breed">Breed</th>
+          <th class="cattle-birth_date">Birth date</th>
+          <th class="cattle-acquisition_method">Acquisition method</th>
+          <th class="cattle-entry_date">Entry date</th>
+          <th class="cattle-loss_method">Loss method</th>
+          <th class="cattle-end_date">End date</th>
+          <th class="cattle-comments">Comments</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for cow in cattle %}
+        <tr>
+          <td class="cattle-type">{{ cow.type }}</td>
+          <td class="cattle-number">{{ cow.number }}</td>
+          <td class="cattle-name">{{ cow.name }}</td>
+          <td class="cattle-gender">{{ cow.gender }}</td>
+          <td class="cattle-breed">{{ cow.breed }}</td>
+          <td class="cattle-birth_date">{{ cow.birth_date|date:"Y-m-d" }}</td>
+          <td class="cattle-acquisition_method">{{ cow.acquisition_method }}</td>
+          <td class="cattle-entry_date">{{ cow.entry_date|date:"Y-m-d" }}</td>
+          <td class="cattle-loss_method">{{ cow.loss_method }}</td>
+          <td class="cattle-end_date">{{ cow.end_date|date:"Y-m-d" }}</td>
+          <td class="cattle-comments">
+            <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:20 }}</div>
+            <div id="comments-full-{{ cow.id }}" style="display: none;">{{ cow.comments }}</div>
+            <a href="#" data-cow-id="{{ cow.id }}" data-action="show-more" onclick="showFullComments({{ cow.id }}); return false;">Show More</a>
+            <a href="#" data-cow-id="{{ cow.id }}" data-action="show-less" onclick="showShortComments({{ cow.id }}); return false;" style="display: none;">Show Less</a>
+          </td>
+          <td>
+            <a href="{% url 'my_farm:update_cattle' cow.id %}">Update</a>
+          </td>
+          <td>
+            <a href="{% url 'my_farm:delete_row' cow.id %}">Delete</a>
+          </td>
+        </tr>
     {% endfor %}
-  </tbody>
-</table>
-<a href="{% url 'my_farm:add_row' %}">Add row</a>
+    </tbody>
+  </table>
 
+{% block scripts %}
+  <script>
+     // Function to show the full comments when "Show More" is clicked
+    function showFullComments(cowId) {
+        const shortComments = document.querySelector(`#comments-short-${cowId}`);
+        const fullComments = document.querySelector(`#comments-full-${cowId}`);
+        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
+        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
+
+        // Hide the short comments and show the full comments
+        shortComments.style.display = "none";
+        fullComments.style.display = "";
+
+        // Hide the "Show More" link and show the "Show Less" link
+        showMoreLink.style.display = "none";
+        showLessLink.style.display = "";
+    }
+
+    // Function to show the short comments when "Show Less" is clicked
+    function showShortComments(cowId) {
+        const shortComments = document.querySelector(`#comments-short-${cowId}`);
+        const fullComments = document.querySelector(`#comments-full-${cowId}`);
+        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
+        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
+
+        // Hide the full comments and show the short comments
+        fullComments.style.display = "none";
+        shortComments.style.display = "";
+
+        // Hide the "Show Less" link and show the "Show More" link
+        showLessLink.style.display = "none";
+        showMoreLink.style.display = "";
+    }
+
+
+    const form = document.querySelector('#column-form');
+    const table = document.querySelector('#cattle-table');
+    const columns = Array.from(document.querySelectorAll('[name="columns"]'));
+
+    // Show/hide columns based on user selection
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      columns.forEach((column) => {
+        const columnName = column.value;
+        const columnCells = Array.from(table.querySelectorAll(`.cattle-${columnName}`));
+        columnCells.forEach((cell) => {
+          cell.style.display = column.checked ? '' : 'none';
+        });
+      });
+    });
+  </script>
 </body>
-
+</html>
 
 {% endblock %}

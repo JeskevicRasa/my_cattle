@@ -1,8 +1,9 @@
+from django.db.models import Q
 from django.http import HttpResponse
 from .models import Cattle
 from django.views import generic
-from django.shortcuts import render, redirect
-from my_cattle.forms import GenderForm
+from django.shortcuts import render, redirect, get_object_or_404
+from my_cattle.forms import GenderForm, CattleForm
 
 
 def home(request):
@@ -25,7 +26,8 @@ def cattle_info(request):
         if len(selected_columns) > 0:
             # Build a dictionary of column names and their corresponding database field names
             column_dict = {'ID': 'id', 'Type': 'type', 'Number': 'number', 'Name': 'name', 'Gender': 'gender',
-                           'Breed': 'breed', 'Birth Date': 'birth_date', 'Entry date': 'entry_date', 'End date': 'end_date',
+                           'Breed': 'breed', 'Birth Date': 'birth_date', 'acquisition_method': 'acquisition_method',
+                           'Entry date': 'entry_date', 'loss_method': 'loss_method', 'End date': 'end_date',
                            'Comments': 'comments'}
 
             # Build a list of the selected database field names
@@ -57,6 +59,21 @@ def add_row(request):
     return render(request, 'my_farm/add_row.html', {'form': form})
 
 
+def update_cattle(request, cattle_id=None):
+    cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
+
+    if request.method == 'POST':
+        form = CattleForm(request.POST, instance=cattle)
+        if form.is_valid():
+            form.save()
+            return redirect('my_farm:cattle_info')
+    else:
+        form = CattleForm(instance=cattle)
+
+    context = {'form': form}
+    return render(request, 'my_farm/update_cattle.html', context)
+
+
 def delete_row(request, cattle_id):
     row = Cattle.objects.get(id=cattle_id)
 
@@ -69,3 +86,26 @@ def delete_row(request, cattle_id):
 
 def confirmation_page(request):
     return render(request, 'my_farm/confirmation_page.html')
+
+
+def search_cattle(request):
+    query = request.GET.get('query')
+    if query:
+        cattle_list = Cattle.objects.filter(
+            Q(type__icontains=query) |
+            Q(number__icontains=query) |
+            Q(name__icontains=query) |
+            Q(gender__icontains=query) |
+            Q(breed__icontains=query) |
+            Q(birth_date__icontains=query) |
+            Q(acquisition_method__icontains=query) |
+            Q(entry_date__icontains=query) |
+            Q(loss_method__icontains=query) |
+            Q(end_date__icontains=query) |
+            Q(comments__icontains=query)
+        )
+    else:
+        cattle_list = Cattle.objects.all()
+
+    context = {'cattle_list': cattle_list}
+    return render(request, 'my_farm/search_cattle.html', context)

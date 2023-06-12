@@ -1,0 +1,213 @@
+html, body {
+    background-color: #5bb081;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 80%;
+}
+
+
+.form-heading {
+    align-items: center;
+    color: white;
+    font-size: 24px;
+}
+
+.container {
+    height: 100%;
+    justify-content: center;
+}
+
+.register-card {
+    align-items: center;
+    height: auto;
+    margin-top: 50px;
+    margin-bottom: auto;
+    width: 500px;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 10px;
+    color: white;
+}
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 500px;
+    color: white;
+    height: auto;
+    margin-top: 50px;
+    margin-bottom: auto;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 10px;
+    color: white;
+    padding: 20px;
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    font-size: 18px;
+    text-align: center;
+}
+
+.login-card {
+    height: auto;
+    margin-top: 50px;
+    margin-bottom: auto;
+    width: 450px;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-muted {
+    filter: brightness(1.25);
+}
+
+.btn-primary.btn-block {
+    background-color: #d47e1e;
+}
+
+.btn-block {
+    color: white;
+    background-color: #d47e1e;
+    outline: none;
+}
+
+.btn-block:hover {
+    background-color: #c27219;
+    color: white;
+    outline: none;
+}
+
+.login-button {
+    color: white;
+    width: 120px;
+    display: center;
+}
+
+.btn-lg {
+    color: white;
+    background-color: #d47e1e;
+    transition: background-color 0.3s ease;
+}
+
+.btn-lg:hover {
+    background-color: #c27219;
+    color: white;
+}
+
+.input-group-prepend span {
+    width: 50px;
+    background-color: #28a745;
+    color: black;
+    border: 0 !important;
+}
+
+.links {
+    color: white;
+}
+
+.links a {
+    margin-left: 4px;
+}color: white
+      padding: 20px;
+}
+    .profile-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+
+    .profile-info {
+      font-size: 18px;
+      text-align: center;
+    }
+
+
+
+.login-card {
+  height: auto;
+  margin-top: 50px;
+  margin-bottom: auto;
+  width: 450px;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Muted text */
+
+.text-muted {
+   filter: brightness(1.25)
+   }
+
+/* Login and register page buttons */
+
+.btn-primary btn-block {
+    background-color: #d47e1e;
+}
+
+.btn-block {
+    color: white;
+    background-color: #d47e1e;
+    outline: none;
+    }
+
+.btn-block:hover {
+
+  background-color: #c27219;
+  color: white;
+  outline: none;
+}
+
+
+.login-button {
+	color: white;
+	width: 120px;
+	display: center
+}
+
+.btn-lg {
+    color: white;
+    background-color: #d47e1e;
+    transition: background-color 0.3s ease;
+    }
+
+.btn-lg:hover {
+  background-color: #c27219;
+  color: white;
+
+}
+
+/* Login and register icons */
+
+.input-group-prepend span {
+	width: 50px;
+	background-color: #28a745;
+	color: black;
+	border: 0 !important;
+}
+
+
+
+.links {
+	color: white;
+}
+
+.links a {
+	margin-left: 4px;
+}
+
+

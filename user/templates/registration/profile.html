@@ -1,0 +1,22 @@
+{% extends 'base_user.html' %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <title>User Profile</title>
+    <div class="d-flex justify-content-center">
+        <div class="profile-card">
+            <h2 class="form-heading">Authorized User</h2>
+            <img class="profile-image" src="profile-picture.jpg" alt="Profile Picture">
+            <div class="profile-info">
+                <h1>{{ username }}</h1>
+                <p>{{ email }}</p>
+
+                <div class="button-container">
+                    <a href="{% url 'password_change' %}" class="btn btn-block">Change password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

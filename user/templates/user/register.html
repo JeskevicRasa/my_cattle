@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'info' %}success{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="container">
+        <div class="d-flex justify-content-center h-100">
+            <div class="register-card">
+                <div class="card-header">
+                    <span class="form-heading">Create Account</span>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="form-control" placeholder="Enter username" required>
+                            </div>
+                            <small id="usernameHelp" class="form-text text-muted">Required. 150 characters or fewer. Letters, digits, and @/./+/-/_ only.</small>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" class="form-control" placeholder="Enter email" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                </div>
+                                <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}" class="form-control" placeholder="New password" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('{{ form.password1.id_for_label }}', 'togglePasswordIcon1')">
+                                        <i id="togglePasswordIcon1" class="fas fa-eye-slash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small id="PasswordHelp" class="form-text text-muted">Password must contain at least 8 characters and can't be entirely numeric.</small>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                </div>
+                                <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}" class="form-control" placeholder="Password confirmation" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('{{ form.password2.id_for_label }}', 'togglePasswordIcon2')">
+                                        <i id="togglePasswordIcon2" class="fas fa-eye-slash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small id="PasswordconfHelp" class="form-text text-muted">Enter the same password as before, for verification.</small>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

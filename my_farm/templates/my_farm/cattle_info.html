@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+{% extends 'base_user.html' %}
+{% block content %}
+
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,5 +51,8 @@ table, th, td {
   </tbody>
 </table>
 <a href="{% url 'my_farm:add_row' %}">Add row</a>
+
 </body>
-</html>
+
+
+{% endblock %}

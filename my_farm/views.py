@@ -1,12 +1,23 @@
+from __future__ import print_function
 from django.http import HttpResponse
-from .models import Cattle
+from my_farm.models import Cattle
 from django.views import generic
 from django.shortcuts import render, redirect
 from my_cattle.forms import GenderForm
+from django.db.models import Count
+
+
 
 
 def home(request):
-    return HttpResponse("Hello, you are in my farm yeay")
+    cattle = Cattle.objects.all()
+    cows = Cattle.objects.filter(type='Galvijai')
+    context = {
+        'total_cattle': len(cattle),
+        'total_cows': len(cows)
+    }
+
+    return render(request, 'my_farm/my_farm_main.html', context)
 
 
 def cattle_info(request):
@@ -37,3 +48,5 @@ def delete_row(request, cattle_id):
 
 def confirmation_page(request):
     return render(request, 'my_farm/confirmation_page.html')
+
+

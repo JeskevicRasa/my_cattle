@@ -2,16 +2,13 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from datetime import date
 from django.db.models import Q
-from django.http import HttpResponse
 from .models import Cattle
-from django.views import generic
 from django.shortcuts import render, redirect, get_object_or_404
 from my_cattle.forms import GenderForm, CattleForm
 from django.shortcuts import render, redirect
 from my_cattle.forms import GenderForm
 from django.db.models import Count
-from constants.constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, \
-    DAILY_WEIGHT_GAIN
+from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, DAILY_WEIGHT_GAIN
 
 
 def calculate_age_ranges():
@@ -180,9 +177,6 @@ def estimate_cow_weight(request, cattle_id):
         'weight': weight,
     }
     return render(request, 'my_farm/report.html', context)
-
-
-
 
 
 def generate_report(request):

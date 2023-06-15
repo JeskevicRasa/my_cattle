@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import Q
 from django.http import HttpResponse
 from .models import Cattle
@@ -7,8 +9,8 @@ from my_cattle.forms import GenderForm, CattleForm
 from django.shortcuts import render, redirect
 from my_cattle.forms import GenderForm
 from django.db.models import Count
-
-
+from constants.constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, \
+    DAILY_WEIGHT_GAIN
 
 
 def home(request):
@@ -117,3 +119,31 @@ def search_cattle(request):
 
     context = {'cattle_list': cattle_list}
     return render(request, 'my_farm/search_cattle.html', context)
+
+
+def estimate_cow_weight(request, cattle_id):
+    cattle = Cattle.objects.get(id=cattle_id)
+    birth_date = cattle.birth_date
+    estimation_date = request.POST.get('estimation_date')
+    estimation_date = date.fromisoformat(estimation_date)
+
+    days_passed = (estimation_date - birth_date).days
+
+    gender = cattle.gender
+
+    if gender == 'female':
+        weight = FEMALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+        weight = min(weight, FEMALE_MAX_WEIGHT)  # Limit weight to maximum allowed for females
+    elif gender == 'male':
+        weight = MALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+        weight = min(weight, MALE_MAX_WEIGHT)  # Limit weight to maximum allowed for males
+
+    context = {
+        'cattle': cattle,
+        'birth_date': birth_date,
+        'estimation_date': estimation_date,
+        'weight': weight,
+    }
+    return render(request, 'my_farm/report.html', context)
+
+

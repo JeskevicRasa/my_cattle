@@ -9,9 +9,16 @@ class BaseModel(models.Model):
 
 
 class Cattle(models.Model):
+
+    BREED = [
+        ('Angus', 'Angus'),
+        ('Crossbreed', 'Crossbreed'),
+    ]
+
     GENDER = [
-        ('Female', 'Female'),
-        ('Male', 'Male'),
+        ('Heifer', 'Heifer'),
+        ('Bull', 'Bull'),
+        ('Cow', 'Cow'),
     ]
 
     ACQUISITION_METHOD = [
@@ -27,14 +34,14 @@ class Cattle(models.Model):
         ('Gifted', 'Gifted'),
     ]
 
-    type = models.CharField(max_length=80, blank=False)
+    type = models.CharField(default='Cattle', max_length=80, blank=False)
     number = models.CharField(max_length=80, blank=False, unique=True)
-    name = models.CharField(max_length=80, blank=False)
+    name = models.CharField(max_length=80, blank=True, null=True)
     gender = models.CharField(choices=GENDER, max_length=80, blank=False)
-    breed = models.CharField(max_length=80, blank=False)
-    birth_date = models.DateField()
+    breed = models.CharField(choices=BREED, max_length=80, blank=False)
+    birth_date = models.DateField(blank=False)
     acquisition_method = models.CharField(choices=ACQUISITION_METHOD, max_length=80, blank=True, null=True)
-    entry_date = models.DateField()
+    entry_date = models.DateField(blank=False)
     loss_method = models.CharField(choices=LOSS_METHOD, max_length=80, blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     comments = models.TextField(max_length=2000)
@@ -46,5 +53,3 @@ class Cattle(models.Model):
 
     def __str__(self):
         return f'{self.name},  {self.gender}, {self.birth_date}'
-
-

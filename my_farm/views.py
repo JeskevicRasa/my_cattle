@@ -1,3 +1,5 @@
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from django.http import HttpResponse
 from .models import Cattle
@@ -11,12 +13,46 @@ from django.db.models import Count
 
 
 
+def calculate_age_ranges():
+    current_date = date.today()
+    one_year_age_date = current_date - relativedelta(months=12)
+    two_year_ago_date = current_date - relativedelta(months=24)
+
+    age_ranges = {
+        'total_calves': Cattle.objects.filter(
+            Q(birth_date__gte=one_year_age_date) & (Q(gender='Heifer') | Q(gender='Bull'))
+        ).count(),
+        'total_young_heifer': Cattle.objects.filter(
+            birth_date__lte=one_year_age_date,
+            birth_date__gte=two_year_ago_date,
+            gender='Heifer'
+        ).count(),
+        'total_adult_heifer': Cattle.objects.filter(
+            birth_date__lte=two_year_ago_date,
+            gender='Heifer'
+        ).count(),
+        'total_young_bull': Cattle.objects.filter(
+            birth_date__lte=one_year_age_date,
+            birth_date__gte=two_year_ago_date,
+            gender='Bull'
+        ).count(),
+        'total_adult_bull': Cattle.objects.filter(
+            birth_date__lte=two_year_ago_date,
+            gender='Bull'
+        ).count()
+    }
+
+    return age_ranges
+
+
 def home(request):
-    cattle = Cattle.objects.all()
-    cows = Cattle.objects.filter(type='Galvijai')
+    cattle_count = Cattle.objects.count()
+    cow_count = Cattle.objects.filter(gender='Cow').count()
+
     context = {
-        'total_cattle': len(cattle),
-        'total_cows': len(cows)
+        'total_cattle': cattle_count,
+        'total_cow': cow_count,
+        **calculate_age_ranges()
     }
 
     return render(request, 'my_farm/my_farm_main.html', context)
@@ -117,3 +153,53 @@ def search_cattle(request):
 
     context = {'cattle_list': cattle_list}
     return render(request, 'my_farm/search_cattle.html', context)
+
+
+def generate_report(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        # Store the data in session
+        request.session['report_data'] = {
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+
+        return redirect('my_farm:report')
+
+    return render(request, 'my_farm/generate_report.html')
+
+
+def report(request):
+    # Retrieve the data from session
+    report_data = request.session.get('report_data')
+    if not report_data:
+        return redirect('my_farm:generate_report')
+
+    # Clear the session data
+    request.session['report_data'] = None
+
+    # Perform necessary calculations for the report based on the provided dates
+    start_date = report_data['start_date']
+    end_date = report_data['end_date']
+
+    start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+    end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+
+    total_calves_before_start_date = Cattle.objects.filter(
+        Q(birth_date__lt=start_datetime) &
+        (Q(gender='Heifer') | Q(gender='Bull'))
+    ).count()
+
+    total_calves_before_end_date = Cattle.objects.filter(
+        Q(birth_date__lt=end_datetime) &
+        (Q(gender='Heifer') | Q(gender='Bull'))
+    ).count()
+
+
+    # Generate the report data
+    report_data['total_calves_first'] = total_calves_before_start_date
+    report_data['total_calves_second'] = total_calves_before_end_date
+
+    return render(request, 'my_farm/report.html', {'report_data': report_data})

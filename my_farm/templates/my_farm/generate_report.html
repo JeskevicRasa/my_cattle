@@ -1,0 +1,20 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+<head>
+  <title>Generate Report</title>
+</head>
+<body>
+  <h1>Generate Report</h1>
+  <form method="post" action="{% url 'my_farm:generate_report' %}">
+    {% csrf_token %}
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" required>
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" required>
+
+    <button type="submit">Generate Report</button>
+  </form>
+</body>
+{% endblock %}

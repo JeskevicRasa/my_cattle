@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, cattle_info, add_row, delete_row, confirmation_page, update_cattle, search_cattle
+from .views import home, cattle_info, add_row, delete_row, confirmation_page, update_cattle, search_cattle, generate_report, report
 
 
 app_name = "my_farm"
@@ -12,6 +12,9 @@ urlpatterns = [
     path('delete_row/<int:cattle_id>/', delete_row, name='delete_row'),
     path('search_cattle/', search_cattle, name='search_cattle'),
     path('confirmation_page/', confirmation_page, name='confirmation_page'),
+    path('generate_report/', generate_report, name='generate_report'),
+    path('report/', report, name='report'),
+
 
 
 ]

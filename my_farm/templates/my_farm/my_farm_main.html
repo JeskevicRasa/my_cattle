@@ -38,7 +38,7 @@
                     <img src="{% static 'img/cow3.png' %}" width="60" height="60" alt="Cow Icon">
                   </div>
                   <div class="media-body text-center">
-                    <h3></h3>
+                    <h3>{{ total_cow }}</h3>
                     <span>Cows</span>
                   </div>
                 </div>
@@ -56,7 +56,7 @@
                     <img src="{% static 'img/calve1.png' %}" width="60" height="60" alt="Calve Icon">
                   </div>
                   <div class="media-body text-center">
-                    <h3></h3>
+                    <h3>{{ total_calves }}</h3>
                     <span>Calves</span>
                   </div>
                 </div>
@@ -70,7 +70,7 @@
             <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-block">All cattle</a>
           </div>
           <div class="card">
-            <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-block">Report</a>
+            <a href="{% url 'my_farm:generate_report' %}" class="btn btn-block">Report</a>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="danger"></h3>
+                    <h3 class="danger">{{ total_young_heifer }}</h3>
                     <span>Young Heifers</span><br>
                   </div>
                   <div class="align-self-center">
@@ -100,7 +100,7 @@
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="success"></h3>
+                    <h3 class="success">{{ total_adult_heifer }}</h3>
                     <span>Adult Heifers</span>
                   </div>
                   <div class="align-self-center">
@@ -118,7 +118,7 @@
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="warning"></h3>
+                    <h3 class="warning">{{ total_young_bull }}</h3>
                     <span>Young Bulls</span>
                   </div>
                   <div class="align-self-center">
@@ -136,7 +136,7 @@
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="primary"></h3>
+                    <h3 class="primary">{{ total_adult_bull }}</h3>
                     <span>Adult Bulls</span>
                   </div>
                   <div class="align-self-center">

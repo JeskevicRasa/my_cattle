@@ -89,10 +89,12 @@
             <a href="#" data-cow-id="{{ cow.id }}" data-action="show-less" onclick="showShortComments({{ cow.id }}); return false;" style="display: none;">Show Less</a>
           </td>
           <td>
+            <!-- Update link -->
             <a href="{% url 'my_farm:update_cattle' cow.id %}">Update</a>
           </td>
           <td>
-            <a href="{% url 'my_farm:delete_row' cow.id %}">Delete</a>
+            <!-- Delete link -->
+            <a href="{% url 'my_farm:delete_cattle' cow.id %}" onclick="return confirm('Are you sure you want to delete this cow?');">Delete</a>
           </td>
         </tr>
     {% endfor %}

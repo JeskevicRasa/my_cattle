@@ -1,10 +1,14 @@
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
+
 from dateutil.relativedelta import relativedelta
 from datetime import date
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from my_cattle.forms import GenderForm, CattleForm
+from .models import Cattle
+from django.shortcuts import get_object_or_404
+from my_cattle.forms import CattleForm
 from django.shortcuts import render, redirect
 from my_cattle.forms import GenderForm
 from django.shortcuts import render
@@ -13,18 +17,24 @@ from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT
 from django.views import View
 from django.urls import reverse
 
+from django.views import View
+from django.urls import reverse
+from .groups import GroupsManagement, GroupNumbers
+
 
 def calculate_cattle_age(birth_date, estimation_date):
-    age = relativedelta(estimation_date, birth_date)
-    age_in_months = age.years * 12 + age.months
-    return age_in_months
-
-
+    if estimation_date < birth_date:
+        return -1
+    else:
+        age = relativedelta(estimation_date, birth_date)
+        age_in_months = age.years * 12 + age.months
+        return age_in_months
+#
 def calculate_cattle(estimation_date):
+
 
     cattle = Cattle.objects.all()
     total_cattle = cattle.count()
-
     age_list = []
     for c in cattle:
         age_in_months = calculate_cattle_age(c.birth_date, estimation_date)
@@ -33,7 +43,6 @@ def calculate_cattle(estimation_date):
             'age_in_months': age_in_months,
         }
         age_list.append(cattle_dict)
-
     total_cows = sum(1 for c in cattle if c.gender == 'Cow')
     total_calves = sum(1 for item in age_list if item['gender'] in ['Heifer', 'Bull'] and item['age_in_months'] < 12)
     total_young_heifer = sum(1 for item in age_list if item['gender'] == 'Heifer' and 12 <= item['age_in_months'] < 24)
@@ -181,81 +190,6 @@ def search_cattle(request):
     return render(request, 'my_farm/search_cattle.html', context)
 
 
-class GenerateReportView(View):
-    generate_report_template = 'my_farm/generate_report.html'
-    def __init__(self):
-        self.start_date = None
-        self.end_date = None
-
-    def get(self, request):
-        return render(request, self.generate_report_template)
-
-    def post(self, request):
-        self.start_date = date.fromisoformat(request.POST.get('start_date'))
-        self.end_date = date.fromisoformat(request.POST.get('end_date'))
-
-        # Store the data in session
-        request.session['report_data'] = {
-            'start_date': self.start_date.isoformat(),
-            'end_date': self.end_date.isoformat(),
-        }
-
-        return redirect(reverse('my_farm:report'))
-
-
-class LivestockMovementReportView(GenerateReportView, View):
-    report_template = 'my_farm/livestock_movement_report.html'
-
-    def __init__(self):
-        super().__init__()
-        self.current_date = date.today()
-        self.start_date_ranges = None
-        self.end_date_ranges = None
-        self.current_date_ranges = None
-        self.group_name = None
-
-    def load_report_data(self, request):
-        report_data = request.session.get('report_data')
-        if not report_data:
-            return False
-
-        self.start_date = date.fromisoformat(report_data['start_date'])
-        self.end_date = date.fromisoformat(report_data['end_date'])
-        return True
-
-    def get(self, request):
-        if not self.load_report_data(request):
-            return redirect('my_farm:generate_report')
-
-        cattle_count_by_date = self.calculate_cattle_by_date(request)
-        weight_count_by_date = self.calculate_cattle_weight_by_date(request)
-
-        context = {
-            'animals_group': self.group_name,
-            'start_date': self.start_date,
-            'end_date': self.end_date,
-            **cattle_count_by_date,
-            **weight_count_by_date,
-        }
-        return render(request, self.report_template, context)
-
-    def calculate_cattle_by_date(self, request):
-        if not self.load_report_data(request):
-            return redirect('my_farm:generate_report')
-
-        _, start_date_count = self.calculate_cattle(self.start_date)
-        _, end_date_count = self.calculate_cattle(self.end_date)
-
-        cattle_count_by_date = {
-            'start_date_count': start_date_count,
-            'end_date_count': end_date_count
-        }
-
-        return cattle_count_by_date
-
-    def calculate_cattle_age(self, birth_date, estimation_date):
-        age_in_months = (estimation_date.year - birth_date.year) * 12 + (estimation_date.month - birth_date.month)
-        return age_in_months
 
     # def calculate_cattle(self, estimation_date):
     #     cattle = Cattle.objects.all()
@@ -291,6 +225,71 @@ class LivestockMovementReportView(GenerateReportView, View):
     #     }
     #
     #     return cattle_count
+
+class GenerateReportView(View):
+    generate_report_template = 'my_farm/generate_report.html'
+    def __init__(self):
+        self.start_date = None
+        self.end_date = None
+
+    def get(self, request):
+        return render(request, self.generate_report_template)
+
+    def post(self, request):
+        self.start_date = date.fromisoformat(request.POST.get('start_date'))
+        self.end_date = date.fromisoformat(request.POST.get('end_date'))
+
+        # Store the data in session
+        request.session['report_data'] = {
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat(),
+        }
+
+        return redirect(reverse('my_farm:report'))
+
+
+class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReportView, View):
+    report_template = 'my_farm/livestock_movement_report.html'
+
+    def __init__(self):
+        super().__init__()
+        self.groups = []
+
+    def load_report_data(self, request):
+        report_data = request.session.get('report_data')
+        if not report_data:
+            return False
+
+        self.start_date = date.fromisoformat(report_data['start_date'])
+        self.end_date = date.fromisoformat(report_data['end_date'])
+
+        return True
+
+    def get(self, request):
+        if not self.load_report_data(request):
+            return redirect('my_farm:generate_report')
+
+        groups_manager = GroupsManagement
+
+        estimation_date = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+        start_date_groups = groups_manager.calculate_groups(self, estimation_date=self.start_date)
+        end_date_groups = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+
+        self.groups = []
+        for group_name, cattle_data in estimation_date.items():
+            group = GroupNumbers(group_name, cattle_data)
+            group.quantity(start_date_groups, end_date_groups)
+            group.acquisition_loss(self.start_date, self.end_date)
+            self.groups.append(group)
+
+        context = {
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'groups': self.groups,
+        }
+
+        return render(request, self.report_template, context)
+
 
     def calculate_cattle(self, estimation_date):
         cattle = Cattle.objects.all()
@@ -347,6 +346,7 @@ class LivestockMovementReportView(GenerateReportView, View):
 
         return cattle_ids, cattle_count
 
+
     def estimate_cow_weight(self, cattle_id, estimation_date):
         cattle = Cattle.objects.get(id=cattle_id)
         birth_date = cattle.birth_date
@@ -391,3 +391,5 @@ class LivestockMovementReportView(GenerateReportView, View):
         }
 
         return weight_count_by_date
+
+

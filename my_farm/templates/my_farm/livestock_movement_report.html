@@ -1,0 +1,55 @@
+{% extends 'base_user.html' %}
+{% block content %}
+<head>
+  <title>Report</title>
+</head>
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
+<body>
+<p>Reporting Start Date: {{ start_date }}</p>
+<p>Reporting End Date: {{ end_date }}</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Group Name</th>
+      <th>Group Numbers start date</th>
+      <th>Group Numbers end date</th>
+       <th>Difference</th>
+      <th>Births (pcs) </th>
+       <th>Purchases (pcs) </th>
+      <th>Gifts (pcs) </th>
+      <th>Moving (from) (pcs) </th>
+      <th>Moving (to) (pcs) </th>
+      <th>Deaths (pcs)</th>
+      <th>Sold (pcs) </th>
+      <th>Consumed (pcs) </th>
+      <th>Gifted (pcs) </th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for group in groups %}
+    <tr>
+      <td>{{ group.group_name }}</td>
+      <td>{{ group.start_date_count }}</td>
+      <td>{{ group.end_date_count }}</td>
+      <td>{{ group.count_difference }}</td>
+      <td>{{ group.birth_count }}</td>
+      <td>{{ group.purchase_count }}</td>
+      <td>{{ group.gift_count }}</td>
+      <td>{{ group.death_count }}</td>
+      <td>{{ group.sold_count }}</td>
+      <td>{{ group.consumed_count }}</td>
+      <td>{{ group.gifted_count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+</body>
+{% endblock %}

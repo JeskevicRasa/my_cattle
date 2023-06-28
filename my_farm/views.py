@@ -1,58 +1,60 @@
-from datetime import date, datetime
+
 from dateutil.relativedelta import relativedelta
 from datetime import date
 from django.db.models import Q
 from .models import Cattle
-from django.shortcuts import render, redirect, get_object_or_404
-from my_cattle.forms import GenderForm, CattleForm
+from django.shortcuts import get_object_or_404
+from my_cattle.forms import CattleForm
 from django.shortcuts import render, redirect
 from my_cattle.forms import GenderForm
-from django.db.models import Count
 from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, DAILY_WEIGHT_GAIN
+from django.views import View
+from django.urls import reverse
+from .groups import GroupsManagement, GroupNumbers
 
 
-def calculate_age_ranges():
-    current_date = date.today()
-    one_year_age_date = current_date - relativedelta(months=12)
-    two_year_ago_date = current_date - relativedelta(months=24)
+def calculate_cattle_age(birth_date, estimation_date):
+    if estimation_date < birth_date:
+        return -1
+    else:
+        age = relativedelta(estimation_date, birth_date)
+        age_in_months = age.years * 12 + age.months
+        return age_in_months
+#
+def calculate_cattle(estimation_date):
 
-    age_ranges = {
-        'total_calves': Cattle.objects.filter(
-            Q(birth_date__gte=one_year_age_date) & (Q(gender='Heifer') | Q(gender='Bull'))
-        ).count(),
-        'total_young_heifer': Cattle.objects.filter(
-            birth_date__lte=one_year_age_date,
-            birth_date__gte=two_year_ago_date,
-            gender='Heifer'
-        ).count(),
-        'total_adult_heifer': Cattle.objects.filter(
-            birth_date__lte=two_year_ago_date,
-            gender='Heifer'
-        ).count(),
-        'total_young_bull': Cattle.objects.filter(
-            birth_date__lte=one_year_age_date,
-            birth_date__gte=two_year_ago_date,
-            gender='Bull'
-        ).count(),
-        'total_adult_bull': Cattle.objects.filter(
-            birth_date__lte=two_year_ago_date,
-            gender='Bull'
-        ).count()
+    cattle = Cattle.objects.all()
+    total_cattle = cattle.count()
+
+    age_list = []
+    for c in cattle:
+        age_in_months = calculate_cattle_age(c.birth_date, estimation_date)
+        cattle_dict = {
+            'gender': c.gender,
+            'age_in_months': age_in_months,
+        }
+        age_list.append(cattle_dict)
+
+    total_cows = sum(1 for c in cattle if c.gender == 'Cow')
+    total_calves = sum(1 for item in age_list if item['gender'] in ['Heifer', 'Bull'] and item['age_in_months'] < 12)
+    total_young_heifer = sum(1 for item in age_list if item['gender'] == 'Heifer' and 12 <= item['age_in_months'] < 24)
+    total_adult_heifer = sum(1 for item in age_list if item['gender'] == 'Heifer' and item['age_in_months'] >= 24)
+    total_young_bull = sum(1 for item in age_list if item['gender'] == 'Bull' and 12 <= item['age_in_months'] < 24)
+    total_adult_bull = sum(1 for item in age_list if item['gender'] == 'Bull' and item['age_in_months'] >= 24)
+
+    return {
+        'total_cattle': total_cattle,
+        'total_cows': total_cows,
+        'total_calves': total_calves,
+        'total_young_heifer': total_young_heifer,
+        'total_adult_heifer': total_adult_heifer,
+        'total_young_bull': total_young_bull,
+        'total_adult_bull': total_adult_bull,
     }
-
-    return age_ranges
 
 
 def home(request):
-    cattle_count = Cattle.objects.count()
-    cow_count = Cattle.objects.filter(gender='Cow').count()
-
-    context = {
-        'total_cattle': cattle_count,
-        'total_cow': cow_count,
-        **calculate_age_ranges()
-    }
-
+    context = {**calculate_cattle(estimation_date=date.today())}
     return render(request, 'my_farm/my_farm_main.html', context)
 
 
@@ -179,51 +181,113 @@ def estimate_cow_weight(request, cattle_id):
     return render(request, 'my_farm/report.html', context)
 
 
-def generate_report(request):
-    if request.method == 'POST':
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
+class GenerateReportView(View):
+    generate_report_template = 'my_farm/generate_report.html'
+    def __init__(self):
+        self.start_date = None
+        self.end_date = None
+
+    def get(self, request):
+        return render(request, self.generate_report_template)
+
+    def post(self, request):
+        self.start_date = date.fromisoformat(request.POST.get('start_date'))
+        self.end_date = date.fromisoformat(request.POST.get('end_date'))
 
         # Store the data in session
         request.session['report_data'] = {
-            'start_date': start_date,
-            'end_date': end_date,
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat(),
         }
 
-        return redirect('my_farm:report')
-
-    return render(request, 'my_farm/generate_report.html')
+        return redirect(reverse('my_farm:report'))
 
 
-def report(request):
-    # Retrieve the data from session
-    report_data = request.session.get('report_data')
-    if not report_data:
-        return redirect('my_farm:generate_report')
+class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReportView, View):
+    report_template = 'my_farm/livestock_movement_report.html'
 
-    # Clear the session data
-    request.session['report_data'] = None
+    def __init__(self):
+        super().__init__()
+        self.groups = []
 
-    # Perform necessary calculations for the report based on the provided dates
-    start_date = report_data['start_date']
-    end_date = report_data['end_date']
+    def load_report_data(self, request):
+        report_data = request.session.get('report_data')
+        if not report_data:
+            return False
 
-    start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-    end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+        self.start_date = date.fromisoformat(report_data['start_date'])
+        self.end_date = date.fromisoformat(report_data['end_date'])
 
-    total_calves_before_start_date = Cattle.objects.filter(
-        Q(birth_date__lt=start_datetime) &
-        (Q(gender='Heifer') | Q(gender='Bull'))
-    ).count()
+        return True
 
-    total_calves_before_end_date = Cattle.objects.filter(
-        Q(birth_date__lt=end_datetime) &
-        (Q(gender='Heifer') | Q(gender='Bull'))
-    ).count()
+    def get(self, request):
+        if not self.load_report_data(request):
+            return redirect('my_farm:generate_report')
+
+        groups_manager = GroupsManagement
+
+        estimation_date = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+        start_date_groups = groups_manager.calculate_groups(self, estimation_date=self.start_date)
+        end_date_groups = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+
+        self.groups = []
+        for group_name, cattle_data in estimation_date.items():
+            group = GroupNumbers(group_name, cattle_data)
+            group.quantity(start_date_groups, end_date_groups)
+            group.acquisition_loss(self.start_date, self.end_date)
+            self.groups.append(group)
+
+        context = {
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'groups': self.groups,
+        }
+
+        return render(request, self.report_template, context)
 
 
-    # Generate the report data
-    report_data['total_calves_first'] = total_calves_before_start_date
-    report_data['total_calves_second'] = total_calves_before_end_date
+    def estimate_cow_weight(self, cattle_id, estimation_date):
+        cattle = Cattle.objects.get(id=cattle_id)
+        birth_date = cattle.birth_date
 
-    return render(request, 'my_farm/report.html', {'report_data': report_data})
+        days_passed = (estimation_date - birth_date).days
+
+        gender = cattle.gender
+
+        if gender in ['Heifer', 'Cow']:
+            weight = FEMALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+            weight = min(weight, FEMALE_MAX_WEIGHT)
+        elif gender == 'Bull':
+            weight = MALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+            weight = min(weight, MALE_MAX_WEIGHT)
+        else:
+            raise ValueError("Invalid gender. Must be 'Heifer', 'Cow', or 'Bull'.")
+
+        return weight
+
+    def estimate_total_weight_by_ranges(self, estimation_date):
+        cattle_ids, _ = self.calculate_cattle(estimation_date)  # Assign only the cattle_ids dictionary
+
+        total_weight = {}
+        for age_category, ids_list in cattle_ids.items():
+            if ids_list:
+                cattle_queryset = Cattle.objects.filter(id__in=ids_list)  # Filter by the cattle IDs
+                weight = 0
+                for cattle in cattle_queryset:
+                    weight += self.estimate_cow_weight(cattle.id, estimation_date)
+
+                total_weight[age_category] = weight
+
+        return total_weight
+
+    def calculate_cattle_weight_by_date(self, request):
+        if not self.load_report_data(request):
+            return redirect('my_farm:generate_report')
+
+        weight_count_by_date = {
+            'start_date_count_weight': self.estimate_total_weight_by_ranges(self.start_date),
+            'end_date_count_weight': self.estimate_total_weight_by_ranges(self.end_date)
+        }
+
+        return weight_count_by_date
+

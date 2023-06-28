@@ -45,6 +45,7 @@ class Cattle(models.Model):
     loss_method = models.CharField(choices=LOSS_METHOD, max_length=80, blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     comments = models.TextField(max_length=2000)
+    hidden = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Cattle Info"

@@ -1,4 +1,5 @@
 {% extends 'base_user.html' %}
+
 {% block content %}
 <head>
   <title>Report</title>
@@ -15,41 +16,57 @@
 <table>
   <thead>
     <tr>
-      <th>Group Name</th>
-      <th>Group Numbers start date</th>
-      <th>Group Numbers end date</th>
-       <th>Difference</th>
-      <th>Births (pcs) </th>
-       <th>Purchases (pcs) </th>
-      <th>Gifts (pcs) </th>
-      <th>Moving (from) (pcs) </th>
-      <th>Moving (to) (pcs) </th>
-      <th>Deaths (pcs)</th>
-      <th>Sold (pcs) </th>
-      <th>Consumed (pcs) </th>
-      <th>Gifted (pcs) </th>
+      <th>Age Category</th>
+      <th>Beginning of Period (pcs) </th>
+      <th>Beginning of Period (kg)</th>
+      <th>End of Period (pcs)</th>
+      <th>End of Period (kg)</th>
     </tr>
   </thead>
   <tbody>
-    {% for group in groups %}
     <tr>
-      <td>{{ group.group_name }}</td>
-      <td>{{ group.start_date_count }}</td>
-      <td>{{ group.end_date_count }}</td>
-      <td>{{ group.count_difference }}</td>
-      <td>{{ group.birth_count }}</td>
-      <td>{{ group.purchase_count }}</td>
-      <td>{{ group.gift_count }}</td>
-      <td>{{ group.death_count }}</td>
-      <td>{{ group.sold_count }}</td>
-      <td>{{ group.consumed_count }}</td>
-      <td>{{ group.gifted_count }}</td>
+      <td>A cow</td>
+      <td>{{ start_date_count.total_cows }}</td>
+      <td>{{ start_date_count_weight.total_cows }}</td>
+      <td>{{ end_date_count.total_cows }}</td>
+      <td>{{ end_date_count_weight.total_cows }}</td>
     </tr>
-    {% endfor %}
+    <tr>
+      <td>Heifer up to 2 years</td>
+      <td>{{ start_date_count.total_young_heifer }}</td>
+      <td>{{ start_date_count_weight.total_young_heifer }}</td>
+      <td>{{ end_date_count.total_young_heifer }}</td>
+      <td>{{ end_date_count_weight.total_young_heifer }}</td>
+    </tr>
+    <tr>
+      <td>Heifer over 24 months</td>
+      <td>{{ start_date_count.total_adult_heifer }}</td>
+      <td>{{ start_date_count_weight.total_adult_heifer }}</td>
+      <td>{{ end_date_count.total_adult_heifer }}</td>
+      <td>{{ end_date_count_weight.total_adult_heifer }}</td>
+    </tr>
+    <tr>
+      <td>Bull up to 2 years old</td>
+      <td>{{ start_date_count.total_young_bull }}</td>
+      <td>{{ start_date_count_weight.total_young_bull }}</td>
+      <td>{{ end_date_count.total_young_bull }}</td>
+      <td>{{ end_date_count_weight.total_young_bull }}</td>
+    </tr>
+    <tr>
+      <td>Bull over 24 months</td>
+      <td>{{ start_date_count.total_adult_bull }}</td>
+      <td>{{ start_date_count_weight.total_adult_bull }}</td>
+      <td>{{ end_date_count.total_adult_bull }}</td>
+      <td>{{ end_date_count_weight.total_adult_bull }}</td>
+    </tr>
+    <tr>
+      <td>Calves</td>
+      <td>{{ start_date_count.total_calves }}</td>
+      <td>{{ start_date_count_weight.total_calves }}</td>
+      <td>{{ end_date_count.total_calves }}</td>
+      <td>{{ end_date_count_weight.total_calves }}</td>
+    </tr>
   </tbody>
 </table>
-
-
-
 </body>
 {% endblock %}

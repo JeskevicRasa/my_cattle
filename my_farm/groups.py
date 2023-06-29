@@ -24,7 +24,9 @@ class GroupNumbers:
     def quantity(self, start_date_groups, end_date_groups):
 
         self.start_date_count = len(start_date_groups[self.group_name])
+        print(start_date_groups[self.group_name])
         self.end_date_count = len(end_date_groups[self.group_name])
+        print(end_date_groups[self.group_name])
         self.count_difference = self.end_date_count - self.start_date_count
 
     def acquisition_loss(self, start_date, end_date):
@@ -38,7 +40,7 @@ class GroupNumbers:
                     ('entry_date' in cattle and cattle['entry_date'] is not None and start_date <= cattle[
                         'entry_date'] <= end_date)
                     or ('end_date' in cattle and cattle['end_date'] is not None and start_date <= cattle[
-                'end_date'] <= end_date)
+                        'end_date'] <= end_date)
             )
         ]
 
@@ -59,6 +61,7 @@ class GroupNumbers:
                     self.consumed_count += 1
                 elif item['loss_method'] == 'Gifted':
                     self.gifted_count += 1
+
 
 class GroupsManagement:
     def __init__(self):
@@ -92,7 +95,6 @@ class GroupsManagement:
                 and self.calculate_age(cattle['birth_date'], estimation_date) >= 24],
         }
 
-
         return groups
 
     def add_group(self, group_name, estimation_date):
@@ -100,9 +102,6 @@ class GroupsManagement:
         group_data = groups.get(group_name, {})
         self.groups[group_name] = group_data
 
-
-
-#         '''
 
 #Explanation:
 #
@@ -112,20 +111,21 @@ class GroupsManagement:
 #
 # groups variable is assigned the dictionary of groups returned by the calculate_groups method.
 #
-# group_data is initialized as an empty list using the get method on the groups dictionary. If the group_name exists in the dictionary,
-# it will return the corresponding list of cattle; otherwise, it will return an empty list.
+# group_data is initialized as an empty list using the get method on the groups dictionary.
+# If the group_name exists in the dictionary, it will return the corresponding list of cattle; otherwise,
+# it will return an empty list.
 #
 # Finally, the group_data list is appended to the self.groups list, which keeps track of all the groups created.
-# Note: Make sure that the GroupNumbers class is defined and imported correctly to use it as the type hint for the self.groups attribute.
+# Note: Make sure that the GroupNumbers class is defined and imported correctly to use it as the type hint
+# for the self.groups attribute.
 #
 #
-#         '''
+#
 
     # def add_group2(self, group_name, estimation_date):
     #     groups = self.calculate_groups(estimation_date)
     #     group_data = groups.get(group_name, [])
     #     self.groups.append(group_data)
-
 
     def calculate_age(self, birth_date, estimation_date):
         if estimation_date < birth_date:

@@ -1,7 +1,4 @@
 from django.urls import path
-from .views import home, cattle_info, add_row, delete_row, confirmation_page, update_cattle, search_cattle,\
-    LivestockMovementReportView, GenerateReportView
-
 # from .livestock_movement_report import LivestockMovementReportView
 from .views import home, cattle_info, add_row, confirmation_page, update_cattle, search_cattle, \
     GenerateReportView, LivestockMovementReportView, CattleDeleteView
@@ -22,4 +19,3 @@ urlpatterns = [
 ]
 
 
-]

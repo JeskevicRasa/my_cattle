@@ -275,6 +275,7 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
             group.quantity(start_date_groups, end_date_groups)
             group.weight_in_groups_by_date(start_date_groups, end_date_groups)
             group.acquisition_loss(self.start_date, self.end_date)
+            group.check_movement(start_date_groups, end_date_groups)
             self.groups.append(group)
 
         context = {

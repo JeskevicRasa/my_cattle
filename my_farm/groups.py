@@ -17,6 +17,8 @@ class GroupNumbers:
         self.sold_count = 0
         self.consumed_count = 0
         self.gifted_count = 0
+        self.moved_in = 0
+        self.moved_out = 0
 
     def __repr__(self):
         return self.group_name
@@ -29,10 +31,7 @@ class GroupNumbers:
 
     def acquisition_loss(self, start_date, end_date):
 
-        # print(self.group_name)
-        # print(self.group_data)
-
-        filter_acquisition_loss_dates = [
+        self.filter_acquisition_loss_dates = [
             cattle for cattle in self.group_data
             if (
                     ('entry_date' in cattle and cattle['entry_date'] is not None and start_date <= cattle[
@@ -42,7 +41,7 @@ class GroupNumbers:
             )
         ]
 
-        for item in filter_acquisition_loss_dates:
+        for item in self.filter_acquisition_loss_dates:
             if 'acquisition_method' in item:
                 if item['acquisition_method'] == 'Birth':
                     self.birth_count += 1
@@ -59,6 +58,15 @@ class GroupNumbers:
                     self.consumed_count += 1
                 elif item['loss_method'] == 'Gifted':
                     self.gifted_count += 1
+
+    def check_movement(self, start_date_groups, end_date_groups):
+        start_date_list = start_date_groups.get(self.group_name, [])
+        end_date_list = end_date_groups.get(self.group_name, [])
+
+        self.moved_in = sum(1 for item in end_date_list if item not in start_date_list
+                            and item not in self.filter_acquisition_loss_dates)
+        self.moved_out = sum(1 for item in start_date_list if item not in end_date_list
+                             and item not in self.filter_acquisition_loss_dates)
 
 class GroupsManagement:
     def __init__(self):

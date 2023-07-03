@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from .models import Cattle
+from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, DAILY_WEIGHT_GAIN
 
 
 class GroupNumbers:
@@ -10,13 +11,23 @@ class GroupNumbers:
         self.start_date_count = 0
         self.end_date_count = 0
         self.count_difference = 0
+        self.start_date_group_weight = 0
+        self.end_date_group_weight = 0
+        self.weight_difference = 0
         self.birth_count = 0
+        self.birth_weight = 0
         self.purchase_count = 0
+        self.purchase_weight = 0
         self.gift_count = 0
+        self.gift_weight = 0
         self.death_count = 0
+        self.death_weight = 0
         self.sold_count = 0
+        self.sold_weight = 0
         self.consumed_count = 0
+        self.consumed_weight = 0
         self.gifted_count = 0
+        self.gifted_weight = 0
         self.moved_in = 0
         self.moved_out = 0
 
@@ -29,35 +40,62 @@ class GroupNumbers:
         self.end_date_count = len(end_date_groups[self.group_name])
         self.count_difference = self.end_date_count - self.start_date_count
 
+    # def weight_in_groups_by_date(self, start_date_weight, end_date_weight):
+    #
+    #     self.start_date_group_weight = sum(start_date_weight[self.group_name])
+    #     self.end_date_group_weight = sum(end_date_weight[self.group_name])
+    #     self.weight_difference = self.end_date_group_weight - self.start_date_group_weight
+
+    def weight_in_groups_by_date(self, start_date_groups, end_date_groups):
+        start_date_group_data = start_date_groups.get(self.group_name, [])
+        self.start_date_group_weight = sum(cattle_dict['weight'] for cattle_dict in start_date_group_data)
+
+        end_date_group_data = end_date_groups.get(self.group_name, [])
+        self.end_date_group_weight = sum(cattle_dict['weight'] for cattle_dict in end_date_group_data)
+
+        self.weight_difference = round((self.end_date_group_weight - self.start_date_group_weight), 2)
+
     def acquisition_loss(self, start_date, end_date):
 
         self.filter_acquisition_loss_dates = [
             cattle for cattle in self.group_data
             if (
-                    ('entry_date' in cattle and cattle['entry_date'] is not None and start_date <= cattle[
-                        'entry_date'] <= end_date)
-                    or ('end_date' in cattle and cattle['end_date'] is not None and start_date <= cattle[
-                'end_date'] <= end_date)
+                    ('entry_date' in cattle['cattle'] and cattle['cattle']['entry_date'] is not None and start_date <=
+                     cattle['cattle']['entry_date'] <= end_date)
+                    or ('end_date' in cattle['cattle'] and cattle['cattle']['end_date'] is not None and start_date <=
+                        cattle['cattle']['end_date'] <= end_date)
             )
         ]
 
         for item in self.filter_acquisition_loss_dates:
-            if 'acquisition_method' in item:
-                if item['acquisition_method'] == 'Birth':
-                    self.birth_count += 1
-                elif item['acquisition_method'] == 'Purchase':
-                    self.purchase_count += 1
-                elif item['acquisition_method'] == 'Gift':
-                    self.gift_count += 1
-            if 'loss_method' in item:
-                if item['loss_method'] == 'Death':
-                    self.death_count += 1
-                elif item['loss_method'] == 'Sold':
-                    self.sold_count += 1
-                elif item['loss_method'] == 'Consumed':
-                    self.consumed_count += 1
-                elif item['loss_method'] == 'Gifted':
-                    self.gifted_count += 1
+            cattle = item['cattle']
+            weight = item['weight']
+
+        if 'acquisition_method' in cattle:
+            if cattle['acquisition_method'] == 'Birth':
+                self.birth_count += 1
+                self.birth_weight += weight
+            elif cattle['acquisition_method'] == 'Purchase':
+                self.purchase_count += 1
+                self.purchase_weight += weight
+            elif cattle['acquisition_method'] == 'Gift':
+                self.gift_count += 1
+                self.gift_weight += weight
+
+        if 'loss_method' in cattle:
+            if cattle['loss_method'] == 'Death':
+                self.death_count += 1
+                self.death_weight += weight
+            elif cattle['loss_method'] == 'Sold':
+                self.sold_count += 1
+                self.sold_weight += weight
+            elif cattle['loss_method'] == 'Consumed':
+                self.consumed_count += 1
+                self.consumed_weight += weight
+            elif cattle['loss_method'] == 'Gifted':
+                self.gifted_count += 1
+                self.gifted_weight += weight
+
 
     def check_movement(self, start_date_groups, end_date_groups):
         start_date_list = start_date_groups.get(self.group_name, [])
@@ -76,31 +114,35 @@ class GroupsManagement:
         cattle_list = list(Cattle.objects.values())
 
         groups = {
-            'Cows': [cattle for cattle in cattle_list if cattle['gender'] == 'Cow'],
+            'Cows': [{'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                     for cattle in cattle_list if cattle['gender'] == 'Cow'],
 
             'Calves': [
-                cattle for cattle in cattle_list if cattle['gender'] in ['Heifer', 'Bull']
+                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                for cattle in cattle_list if cattle['gender'] in ['Heifer', 'Bull']
                 and 0 <= self.calculate_age(cattle['birth_date'], estimation_date) < 12],
 
             'Young Heifer': [
-                cattle for cattle in cattle_list if cattle['gender'] == 'Heifer'
-                and 12 <= self.calculate_age(cattle['birth_date'],
-                estimation_date) < 24],
+                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                for cattle in cattle_list if cattle['gender'] == 'Heifer'
+                and 12 <= self.calculate_age(cattle['birth_date'], estimation_date) < 24],
 
             'Adult Heifer': [
-                cattle for cattle in cattle_list if cattle['gender'] == 'Heifer'
+                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                for cattle in cattle_list if cattle['gender'] == 'Heifer'
                 and self.calculate_age(cattle['birth_date'], estimation_date) >= 24],
 
             'Young Bull': [
-                cattle for cattle in cattle_list if cattle['gender'] == 'Bull'
+                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                for cattle in cattle_list if cattle['gender'] == 'Bull'
                 and 12 <= self.calculate_age(cattle['birth_date'], estimation_date) < 24],
 
             'Adult Bull': [
-                cattle for cattle in cattle_list if cattle['gender'] == 'Bull'
+                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
+                for cattle in cattle_list if cattle['gender'] == 'Bull'
                 and self.calculate_age(cattle['birth_date'], estimation_date) >= 24],
         }
-
-
+        print(groups)
         return groups
 
     def add_group(self, group_name, estimation_date):
@@ -143,16 +185,22 @@ class GroupsManagement:
             age_in_months = age.years * 12 + age.months
             return age_in_months
 
+    def estimate_cattle_weight(self, cattle_id, estimation_date):
+        cattle = Cattle.objects.get(id=cattle_id)
+        birth_date = cattle.birth_date
 
-#
-# a = Groups_management()
-# a.calculate_groups(estimation_date=date.today())
-#
-# # Access the groups and their numbers
-# for group in a.groups:
-#     print(f"Group: {group.group_name}")
-#     print("Data from the database:")
-#     for cattle in group.group_data:
-#         print(cattle)  # You can access all the information of each cattle in the group
-#     print(f"Numbers: {group.numbers}")
-#     print()
+        days_passed = (estimation_date - birth_date).days
+
+        gender = cattle.gender
+
+        if gender in ['Heifer', 'Cow']:
+            weight = FEMALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+            weight = min(weight, FEMALE_MAX_WEIGHT)
+        elif gender == 'Bull':
+            weight = MALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
+            weight = min(weight, MALE_MAX_WEIGHT)
+        else:
+            raise ValueError("Invalid gender. Must be 'Heifer', 'Cow', or 'Bull'.")
+
+        return weight
+

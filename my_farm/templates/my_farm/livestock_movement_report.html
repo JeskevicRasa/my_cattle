@@ -17,17 +17,27 @@
     <tr>
       <th>Group Name</th>
       <th>Group Numbers start date</th>
+      <th>Group Weight start date</th>
       <th>Group Numbers end date</th>
-       <th>Difference</th>
+      <th>Group Weight end date</th>
+       <th>Difference (pcs)</th>
+       <th>Difference (kg)</th>
       <th>Births (pcs) </th>
+      <th>Births (kg) </th>
        <th>Purchases (pcs) </th>
+       <th>Purchases (kg) </th>
       <th>Gifts (pcs) </th>
+      <th>Gifts (kg) </th>
+      <th>Deaths (pcs)</th>
+      <th>Deaths (kg)</th>
+      <th>Sold (pcs) </th>
+      <th>Sold (kg) </th>
+      <th>Consumed (pcs) </th>
+      <th>Consumed (kg) </th>
+      <th>Gifted (pcs) </th>
+      <th>Gifted (kg) </th>
       <th>Moving (from) (pcs) </th>
       <th>Moving (to) (pcs) </th>
-      <th>Deaths (pcs)</th>
-      <th>Sold (pcs) </th>
-      <th>Consumed (pcs) </th>
-      <th>Gifted (pcs) </th>
     </tr>
   </thead>
   <tbody>
@@ -35,15 +45,25 @@
     <tr>
       <td>{{ group.group_name }}</td>
       <td>{{ group.start_date_count }}</td>
+      <td>{{ group.start_date_group_weight }}</td>
       <td>{{ group.end_date_count }}</td>
+      <td>{{ group.end_date_group_weight }}</td>
       <td>{{ group.count_difference }}</td>
+      <td>{{ group.weight_difference }}</td>
       <td>{{ group.birth_count }}</td>
+      <td>{{ group.birth_weight }}</td>
       <td>{{ group.purchase_count }}</td>
+      <td>{{ group.purchase_weight }}</td>
       <td>{{ group.gift_count }}</td>
+      <td>{{ group.gift_weight }}</td>
       <td>{{ group.death_count }}</td>
+      <td>{{ group.death_weight }}</td>
       <td>{{ group.sold_count }}</td>
+      <td>{{ group.sold_weight }}</td>
       <td>{{ group.consumed_count }}</td>
+      <td>{{ group.consumed_weight }}</td>
       <td>{{ group.gifted_count }}</td>
+      <td>{{ group.gifted_weight }}</td>
     </tr>
     {% endfor %}
   </tbody>

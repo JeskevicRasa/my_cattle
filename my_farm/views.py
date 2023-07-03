@@ -1,21 +1,10 @@
-from django.views.generic import DeleteView
-from django.urls import reverse_lazy
-
 from dateutil.relativedelta import relativedelta
 from datetime import date
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from my_cattle.forms import GenderForm, CattleForm
 from .models import Cattle
-from django.shortcuts import get_object_or_404
-from my_cattle.forms import CattleForm
-from django.shortcuts import render, redirect
-from my_cattle.forms import GenderForm
-from django.shortcuts import render
-from .models import Cattle
 from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, DAILY_WEIGHT_GAIN
-from django.views import View
-from django.urls import reverse
 
 from django.views import View
 from django.urls import reverse
@@ -29,9 +18,9 @@ def calculate_cattle_age(birth_date, estimation_date):
         age = relativedelta(estimation_date, birth_date)
         age_in_months = age.years * 12 + age.months
         return age_in_months
-#
-def calculate_cattle(estimation_date):
 
+
+def calculate_cattle(estimation_date):
 
     cattle = Cattle.objects.all()
     total_cattle = cattle.count()
@@ -226,6 +215,7 @@ def search_cattle(request):
     #
     #     return cattle_count
 
+
 class GenerateReportView(View):
     generate_report_template = 'my_farm/generate_report.html'
     def __init__(self):
@@ -274,11 +264,16 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         estimation_date = groups_manager.calculate_groups(self, estimation_date=self.end_date)
         start_date_groups = groups_manager.calculate_groups(self, estimation_date=self.start_date)
         end_date_groups = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+        # start_date_weight = groups_manager.estimate_weight_by_groups(self, estimation_date=self.start_date,
+        #                                                              group_data=start_date_groups)
+        # end_date_weight = groups_manager.estimate_weight_by_groups(self, estimation_date=self.end_date,
+        #                                                            group_data=end_date_groups)
 
         self.groups = []
         for group_name, cattle_data in estimation_date.items():
             group = GroupNumbers(group_name, cattle_data)
             group.quantity(start_date_groups, end_date_groups)
+            group.weight_in_groups_by_date(start_date_groups, end_date_groups)
             group.acquisition_loss(self.start_date, self.end_date)
             self.groups.append(group)
 
@@ -289,7 +284,6 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         }
 
         return render(request, self.report_template, context)
-
 
     def calculate_cattle(self, estimation_date):
         cattle = Cattle.objects.all()
@@ -345,7 +339,6 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         }
 
         return cattle_ids, cattle_count
-
 
     def estimate_cow_weight(self, cattle_id, estimation_date):
         cattle = Cattle.objects.get(id=cattle_id)

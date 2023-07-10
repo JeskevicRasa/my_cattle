@@ -1,13 +1,15 @@
 from dateutil.relativedelta import relativedelta
 from datetime import date
+
+from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import DeleteView
 from my_cattle.forms import GenderForm, CattleForm
 from .models import Cattle
-from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT, MALE_MAX_WEIGHT, DAILY_WEIGHT_GAIN
-
 from django.views import View
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from .groups import GroupsManagement, GroupNumbers
 
 
@@ -22,7 +24,7 @@ def calculate_cattle_age(birth_date, estimation_date):
 
 def calculate_cattle(estimation_date):
 
-    cattle = Cattle.objects.all()
+    cattle = Cattle.objects.filter(deleted=False)
     total_cattle = cattle.count()
     age_list = []
     for c in cattle:
@@ -56,7 +58,15 @@ def home(request):
 
 
 def cattle_info(request):
-    cattle = Cattle.objects.filter(hidden=False)
+    cattle = Cattle.objects.filter(deleted=False)
+    paginator = Paginator(cattle, 3)  # Show 3 cattle per page
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'cattle': page_obj,
+    }
 
     # Get a list of all the columns in the Cattle model
     all_columns = ['ID', 'Type', 'Number', 'Name', 'Gender', 'Breed', 'Birth Date',
@@ -97,7 +107,7 @@ def cattle_info(request):
     else:
         cattle = cattle.values()
 
-    return render(request, 'my_farm/cattle_info.html', {'cattle': cattle, 'columns': all_columns})
+    return render(request, 'my_farm/cattle_info.html', context)
 
 
 def add_row(request):
@@ -115,10 +125,10 @@ def update_cattle(request, cattle_id=None):
     cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
 
     if request.method == 'POST':
-        form = CattleForm(request.POST, instance=cattle)
+        form = CattleForm(request.POST, request.FILES, instance=cattle)
         if form.is_valid():
             form.save()
-            return redirect('my_farm:cattle_info')
+            return redirect('my_farm:one_cattle_info', cattle_id=cattle_id)
     else:
         form = CattleForm(instance=cattle)
 
@@ -126,30 +136,42 @@ def update_cattle(request, cattle_id=None):
     return render(request, 'my_farm/update_cattle.html', context)
 
 
-# def delete_row(request, cattle_id):
-#     row = Cattle.objects.get(id=cattle_id)
-#
-#     if request.method == 'POST':
-#         row.delete()
-#         return redirect('my_farm:confirmation_page')
-#     else:
-#         return render(request, 'my_farm/cattle_confirm_delete.html', {'row': row})
+def one_cattle_info(request, cattle_id=None):
+    cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
+
+    context = {'cattle': cattle}
+    return render(request, 'my_farm/one_cattle_info.html', context)
 
 
-class CattleDeleteView(View):
-    def get(self, request, cow_id):
-        cow = get_object_or_404(Cattle, id=cow_id)
+def upload_picture(request, cattle_id):
+    cattle = get_object_or_404(Cattle, id=cattle_id)
 
-        # Set the hidden field to True
-        cow.hidden = True
-        cow.save()
+    if request.method == 'POST':
+        picture = request.FILES.get('picture')
 
-        # Store the hidden cow ID in session or any other storage mechanism
-        hidden_cows = request.session.get('hidden_cows', [])
-        hidden_cows.append(cow_id)
-        request.session['hidden_cows'] = hidden_cows
+        if picture:
+            cattle.picture = picture
+            cattle.save()
+            return redirect('my_farm:one_cattle_info', cattle_id=cattle_id)
 
-        return redirect('my_farm:cattle_info')
+    return render(request, 'my_farm/upload_picture.html', {'cattle': cattle})
+
+
+class CattleDeleteView(DeleteView):
+    model = Cattle
+    template_name = 'my_farm/cattle_confirm_delete.html'  # Update with the appropriate template name
+    success_url = reverse_lazy('my_farm:one_cattle_info')  # Updated URL pattern name
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset=queryset)
+        if obj.deleted:
+            raise Http404("The cattle does not exist.")
+        return obj
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()  # Call the delete method
+        return HttpResponseRedirect(self.get_success_url())
 
 
 def confirmation_page(request):
@@ -159,7 +181,7 @@ def confirmation_page(request):
 def search_cattle(request):
     query = request.GET.get('query')
     if query:
-        cattle_list = Cattle.objects.filter(
+        cattle_list = Cattle.objects.filter(deleted=False).filter(
             Q(type__icontains=query) |
             Q(number__icontains=query) |
             Q(name__icontains=query) |
@@ -171,49 +193,13 @@ def search_cattle(request):
             Q(loss_method__icontains=query) |
             Q(end_date__icontains=query) |
             Q(comments__icontains=query)
+
         )
     else:
-        cattle_list = Cattle.objects.all()
+        cattle_list = Cattle.objects.filter(deleted=False)
 
     context = {'cattle_list': cattle_list}
     return render(request, 'my_farm/search_cattle.html', context)
-
-
-
-    # def calculate_cattle(self, estimation_date):
-    #     cattle = Cattle.objects.all()
-    #     total_cattle = cattle.count()
-    #
-    #     age_list = []
-    #     for c in cattle:
-    #         age_in_months = self.calculate_cattle_age(c.birth_date, estimation_date)
-    #         cattle_dict = {
-    #             'id': c.id,  # Add cattle ID to the dictionary
-    #             'gender': c.gender,
-    #             'age_in_months': age_in_months,
-    #         }
-    #         age_list.append(cattle_dict)
-    #
-    #     total_cows = sum(1 for c in cattle if c.gender == 'Cow')
-    #     total_calves = sum(
-    #         1 for item in age_list if item['gender'] in ['Heifer', 'Bull'] and item['age_in_months'] < 12)
-    #     total_young_heifer = sum(
-    #         1 for item in age_list if item['gender'] == 'Heifer' and 12 <= item['age_in_months'] < 24)
-    #     total_adult_heifer = sum(1 for item in age_list if item['gender'] == 'Heifer' and item['age_in_months'] >= 24)
-    #     total_young_bull = sum(1 for item in age_list if item['gender'] == 'Bull' and 12 <= item['age_in_months'] < 24)
-    #     total_adult_bull = sum(1 for item in age_list if item['gender'] == 'Bull' and item['age_in_months'] >= 24)
-    #
-    #     cattle_count = {
-    #         'total_cattle': total_cattle,
-    #         'total_cows': total_cows,
-    #         'total_calves': total_calves,
-    #         'total_young_heifer': total_young_heifer,
-    #         'total_adult_heifer': total_adult_heifer,
-    #         'total_young_bull': total_young_bull,
-    #         'total_adult_bull': total_adult_bull,
-    #     }
-    #
-    #     return cattle_count
 
 
 class GenerateReportView(View):
@@ -264,10 +250,6 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         estimation_date = groups_manager.calculate_groups(self, estimation_date=self.end_date)
         start_date_groups = groups_manager.calculate_groups(self, estimation_date=self.start_date)
         end_date_groups = groups_manager.calculate_groups(self, estimation_date=self.end_date)
-        # start_date_weight = groups_manager.estimate_weight_by_groups(self, estimation_date=self.start_date,
-        #                                                              group_data=start_date_groups)
-        # end_date_weight = groups_manager.estimate_weight_by_groups(self, estimation_date=self.end_date,
-        #                                                            group_data=end_date_groups)
 
         self.groups = []
         for group_name, cattle_data in estimation_date.items():
@@ -285,105 +267,3 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         }
 
         return render(request, self.report_template, context)
-
-    def calculate_cattle(self, estimation_date):
-        cattle = Cattle.objects.all()
-        total_cattle = cattle.count()
-
-        age_list = []
-        cattle_ids = {
-            'total_cows': [],
-            'total_calves': [],
-            'total_young_heifer': [],
-            'total_adult_heifer': [],
-            'total_young_bull': [],
-            'total_adult_bull': [],
-        }
-
-        for c in cattle:
-            age_in_months = self.calculate_cattle_age(c.birth_date, estimation_date)
-            cattle_dict = {
-                'id': c.id,  # Add cattle ID to the dictionary
-                'gender': c.gender,
-                'age_in_months': age_in_months,
-            }
-            age_list.append(cattle_dict)
-
-            if c.gender in ['Cow'] and age_in_months >= 24:
-                cattle_ids['total_cows'].append(c.id)
-            if c.gender in ['Heifer', 'Bull'] and age_in_months < 12:
-                cattle_ids['total_calves'].append(c.id)
-            elif c.gender == 'Heifer' and 12 <= age_in_months < 24:
-                cattle_ids['total_young_heifer'].append(c.id)
-            elif c.gender == 'Heifer' and age_in_months >= 24:
-                cattle_ids['total_adult_heifer'].append(c.id)
-            elif c.gender == 'Bull' and 12 <= age_in_months < 24:
-                cattle_ids['total_young_bull'].append(c.id)
-            elif c.gender == 'Bull' and age_in_months >= 24:
-                cattle_ids['total_adult_bull'].append(c.id)
-
-        total_cows = len(cattle_ids['total_cows'])
-        total_calves = len(cattle_ids['total_calves'])
-        total_young_heifer = len(cattle_ids['total_young_heifer'])
-        total_adult_heifer = len(cattle_ids['total_adult_heifer'])
-        total_young_bull = len(cattle_ids['total_young_bull'])
-        total_adult_bull = len(cattle_ids['total_adult_bull'])
-
-        cattle_count = {
-            'total_cattle': total_cattle,
-            'total_cows': total_cows,
-            'total_calves': total_calves,
-            'total_young_heifer': total_young_heifer,
-            'total_adult_heifer': total_adult_heifer,
-            'total_young_bull': total_young_bull,
-            'total_adult_bull': total_adult_bull,
-        }
-
-        return cattle_ids, cattle_count
-
-    def estimate_cow_weight(self, cattle_id, estimation_date):
-        cattle = Cattle.objects.get(id=cattle_id)
-        birth_date = cattle.birth_date
-
-        days_passed = (estimation_date - birth_date).days
-
-        gender = cattle.gender
-
-        if gender in ['Heifer', 'Cow']:
-            weight = FEMALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
-            weight = min(weight, FEMALE_MAX_WEIGHT)
-        elif gender == 'Bull':
-            weight = MALE_BIRTH_WEIGHT + (days_passed * DAILY_WEIGHT_GAIN)
-            weight = min(weight, MALE_MAX_WEIGHT)
-        else:
-            raise ValueError("Invalid gender. Must be 'Heifer', 'Cow', or 'Bull'.")
-
-        return weight
-
-    def estimate_total_weight_by_ranges(self, estimation_date):
-        cattle_ids, _ = self.calculate_cattle(estimation_date)  # Assign only the cattle_ids dictionary
-
-        total_weight = {}
-        for age_category, ids_list in cattle_ids.items():
-            if ids_list:
-                cattle_queryset = Cattle.objects.filter(id__in=ids_list)  # Filter by the cattle IDs
-                weight = 0
-                for cattle in cattle_queryset:
-                    weight += self.estimate_cow_weight(cattle.id, estimation_date)
-
-                total_weight[age_category] = weight
-
-        return total_weight
-
-    def calculate_cattle_weight_by_date(self, request):
-        if not self.load_report_data(request):
-            return redirect('my_farm:generate_report')
-
-        weight_count_by_date = {
-            'start_date_count_weight': self.estimate_total_weight_by_ranges(self.start_date),
-            'end_date_count_weight': self.estimate_total_weight_by_ranges(self.end_date)
-        }
-
-        return weight_count_by_date
-
-

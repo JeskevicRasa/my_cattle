@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base_user.html' %}
+{% block content %}
+
+
 <head>
     <meta charset="UTF-8">
     <title>Update Cattle Information</title>
@@ -7,10 +9,10 @@
 <body>
     <h3>Update Cattle Information</h3>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Save</button>
     </form>
 </body>
-</html>
+{% endblock %}

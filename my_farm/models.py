@@ -8,6 +8,11 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class CattleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
 class Cattle(models.Model):
 
     BREED = [
@@ -45,7 +50,12 @@ class Cattle(models.Model):
     loss_method = models.CharField(choices=LOSS_METHOD, max_length=80, blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     comments = models.TextField(max_length=2000)
-    hidden = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
+    picture = models.ImageField(upload_to='cattle_pictures', blank=True, null=True)
+
+    def delete(self):
+        self.deleted = True
+        self.save()
 
     class Meta:
         verbose_name = "Cattle Info"

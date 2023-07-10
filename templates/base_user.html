@@ -1,4 +1,4 @@
-
+{% load static %}
 <html lang="en">
 
 <head>
@@ -10,22 +10,16 @@
 
     <title>Welcome</title>
 
-    <!-- Bootstrap core CSS -->
+<!-- Bootstrap core CSS -->
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap-extended.min.css">
-    <link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/fonts/simple-line-icons/style.min.css">
-    <link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/colors.min.css">
-    <link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
-
-</head>
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/colors.min.css">
+<link rel="stylesheet" href="{% static 'css/table_styles.css' %}">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 
 
-<body>
 
     <!-- Messages -->
 {% if messages %}
@@ -41,7 +35,7 @@
     {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg static-top navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'my_farm:home' %}">My Cattle</a>
+            <a class="navbar-brand nav-link my-cattle-link" href="{% url 'my_farm:home' %}">My Cattle</a>
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,12 +90,48 @@
 </html>
 
 <style>
+  .navbar {
+    height: 70px;
+    background-color: #E7EFE1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-.navbar {
-  height: 70px; /* Increase the height to 80 pixels */
-  background-color: #E7EFE1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .navbar-nav .nav-link {
+    color: #009C9F; /* Set the default color of navbar links to #009C9F */
+  }
 
+  .navbar-nav .nav-link.my-cattle-link,
+  .navbar-nav .nav-link.my-cattle-link:hover {
+    color: #009C9F !important; /* Set the color of the "My Cattle" link to #009C9F */
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #005E63; /* Set the hover color of navbar links to #005E63 */
+  }
+
+  body {
+    background-color: #F5F7FA;
+  }
+
+    h3, h4, span, a {
+    font-weight: normal !important;
+    color: #444444;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .btn-custom {
+    color: white;
+    background-color: #009C9F;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn-custom:hover {
+    background-color: #008288;
+  }
 </style>
+
+
 

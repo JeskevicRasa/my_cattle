@@ -3,16 +3,18 @@
 {% block content %}
   {% load static %}
 
-  <div class="grey-bg container-fluid">
-    <section id="summary">
-      <div class="row">
-        <div class="col-12 mt-3 mb-1">
-          <h4 class="text-uppercase">Your farms summary</h4>
-        </div>
+<div class="grey-bg container-fluid mt-3 mb-3">
+  <section id="summary">
+    <div class="row">
+      <div class="col-12 mt-3 mb-1">
+        <h4 class="text-uppercase">Your farm summary</h4>
+        <div style="height: 20px;"></div> <!-- Add a gap of 20 pixels -->
       </div>
-      <div class="row">
-        <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+    </div>
+    <div class="row">
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:cattle_info' %}">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -27,10 +29,11 @@
               </div>
             </div>
           </div>
-        </div>
+        </a>
+      </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -48,7 +51,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -66,7 +69,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card" style="margin-top: 5px; margin-bottom: 10px;">
+          <div class="card mb-3" style="margin-top: 5px; margin-bottom: 10px;">
             <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-block">All cattle</a>
           </div>
           <div class="card">
@@ -77,12 +80,12 @@
 
       <div class="row">
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="danger">{{ total_young_heifer }}</h3>
+                    <h3 class="danger" style="color: #EE7B96;">{{ total_young_heifer }}</h3>
                     <span>Young Heifers</span><br>
                   </div>
                   <div class="align-self-center">
@@ -95,7 +98,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -113,7 +116,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -131,7 +134,7 @@
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
@@ -150,5 +153,6 @@
       </div>
     </section>
   </div>
+
 
 {% endblock %}

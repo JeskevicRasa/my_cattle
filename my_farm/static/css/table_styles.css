@@ -1,0 +1,44 @@
+
+
+
+    .table-bordered tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    .table-bordered thead tr.column-names {
+      background-color: #e9e9e9;
+    }
+
+    .table-bordered tbody tr:nth-child(even):not(:hover) {
+      background-color: #f9f9f9;
+    }
+
+    .table-bordered tbody tr:nth-child(odd):not(:hover) {
+      background-color: #ffffff;
+    }
+
+    /* Adjusting table size */
+    .table-bordered {
+      font-size: 16px;
+      padding: 5px;
+      max-width: 800px; /* Adjust the max-width as needed */
+    }
+
+    /* Custom table styling */
+    .table-bordered {
+      color: #444444;
+    }
+
+    .table-bordered th,
+    .table-bordered td {
+      border: 1px solid #e2e2e2;
+    }
+
+    .table-bordered thead th {
+      background-color: #ededed;
+      border-bottom-color: #d5d5d5;
+    }
+
+    .report-info {
+      margin: 20px;
+    }

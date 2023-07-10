@@ -1,29 +1,24 @@
 {% extends 'base_user.html' %}
 {% block content %}
 
-
-    <title>Cattle info</title>
-    <style>
-        table, th, td {
-          border:1px solid black;
-        }
-    </style>
+<title>Cattle info</title>
 
 
-<h1 style="text-align: center;">Cattle info</h1>
+<h3 class="text-uppercase" style="text-align: center; margin: 20px;">All Cattle</h3>
+
+    <form method="POST" action="{% url 'my_farm:add_row' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-custom">Add cattle information</button>
+    </form>
+
+ <p></p>
 
     <!-- Search Tool -->
     <form method="GET" action="{% url 'my_farm:search_cattle' %}">
         <input type="text" name="query" placeholder="Search...">
-        <button type="submit">Search</button>
+        <button type="submit" >Search</button>
     </form>
 
-    <p></p>
-
-    <form method="POST" action="{% url 'my_farm:add_row' %}">
-        {% csrf_token %}
-        <button type="submit">Add cattle information</button>
-    </form>
 
 <p>Select the columns you want to see:</p>
 <form id="column-form">
@@ -52,9 +47,9 @@
     <input type="checkbox" name="columns" value="comments" id="id_comments" checked>
     <button type="submit">Apply</button>
 </form>
-  <table id="cattle-table" style="width:80%">
+  <table id="cattle-table" class="table table-bordered">
       <thead>
-        <tr style="background-color:6F625F;">
+        <tr class="column-names">
           <th class="cattle-type">Type</th>
           <th class="cattle-number">Number</th>
           <th class="cattle-name">Name</th>

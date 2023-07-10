@@ -1,27 +1,21 @@
 {% extends 'base_user.html' %}
 {% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Search Cattle</title>
-    <style>
-        table, th, td {
-          border:1px solid black;
-        }
-    </style>
-</head>
+
 <body>
-    <h1>Search Cattle</h1>
+    <h3>Search cattle</h3>
 
     <form method="GET" action="{% url 'my_farm:search_cattle' %}">
         <input type="text" name="query" value="{{ query }}" placeholder="Search by name">
         <button type="submit">Search</button>
     </form>
 
-    <h2>Search Results:</h2>
-    <table id="cattle-table" style="width:80%">
+    <h4>Search Results:</h4>
+    <div class="table-responsive">
+        <div class="table-container">
+            <table class="table table-bordered">
         <thead>
-            <tr style="background-color:6F625F;">
+            <tr class="column-names">
               <th class="cattle-type">Type</th>
               <th class="cattle-number">Number</th>
               <th class="cattle-name">Name</th>
@@ -35,8 +29,6 @@
               <th class="cattle-comments">Comments</th>
             </tr>
           </thead>
-
-    </thead>
         <tbody>
             {% for cattle in cattle_list %}
             <tr>
@@ -59,5 +51,8 @@
             {% endfor %}
         </tbody>
     </table>
+        </div>
+    </div>
 </body>
+
 {% endblock %}

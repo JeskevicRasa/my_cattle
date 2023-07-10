@@ -6,7 +6,7 @@ class GenderForm(forms.ModelForm):
     class Meta:
         model = Cattle
         fields = ['number', 'name', 'gender', 'breed', 'birth_date', 'acquisition_method',
-                  'entry_date', 'loss_method', 'end_date', 'comments']
+                  'entry_date', 'loss_method', 'end_date', 'comments', 'picture']
         widgets = {
             'gender': forms.Select(choices=Cattle.GENDER),
             'breed': forms.Select(choices=Cattle.BREED),

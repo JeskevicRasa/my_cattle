@@ -19,7 +19,8 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, PasswordResetView
 from my_cattle.views import main
 from user.views import profile, register, password
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', main, name='main'),
@@ -32,5 +33,5 @@ urlpatterns = [
     path('profile/', profile, name='profile'),
     path('profile/password_change/', password, name='password_change'),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

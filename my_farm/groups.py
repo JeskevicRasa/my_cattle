@@ -71,31 +71,30 @@ class GroupNumbers:
             cattle = item['cattle']
             weight = item['weight']
 
-        if 'acquisition_method' in cattle:
-            if cattle['acquisition_method'] == 'Birth':
-                self.birth_count += 1
-                self.birth_weight += weight
-            elif cattle['acquisition_method'] == 'Purchase':
-                self.purchase_count += 1
-                self.purchase_weight += weight
-            elif cattle['acquisition_method'] == 'Gift':
-                self.gift_count += 1
-                self.gift_weight += weight
+            if 'acquisition_method' in cattle:
+                if cattle['acquisition_method'] == 'Birth':
+                    self.birth_count += 1
+                    self.birth_weight += weight
+                elif cattle['acquisition_method'] == 'Purchase':
+                    self.purchase_count += 1
+                    self.purchase_weight += weight
+                elif cattle['acquisition_method'] == 'Gift':
+                    self.gift_count += 1
+                    self.gift_weight += weight
 
-        if 'loss_method' in cattle:
-            if cattle['loss_method'] == 'Death':
-                self.death_count += 1
-                self.death_weight += weight
-            elif cattle['loss_method'] == 'Sold':
-                self.sold_count += 1
-                self.sold_weight += weight
-            elif cattle['loss_method'] == 'Consumed':
-                self.consumed_count += 1
-                self.consumed_weight += weight
-            elif cattle['loss_method'] == 'Gifted':
-                self.gifted_count += 1
-                self.gifted_weight += weight
-
+            if 'loss_method' in cattle:
+                if cattle['loss_method'] == 'Death':
+                    self.death_count += 1
+                    self.death_weight += weight
+                elif cattle['loss_method'] == 'Sold':
+                    self.sold_count += 1
+                    self.sold_weight += weight
+                elif cattle['loss_method'] == 'Consumed':
+                    self.consumed_count += 1
+                    self.consumed_weight += weight
+                elif cattle['loss_method'] == 'Gifted':
+                    self.gifted_count += 1
+                    self.gifted_weight += weight
 
     def check_movement(self, start_date_groups, end_date_groups):
         start_date_list = start_date_groups.get(self.group_name, [])

@@ -1,6 +1,5 @@
 from dateutil.relativedelta import relativedelta
 from datetime import date
-
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseRedirect, Http404
@@ -11,6 +10,7 @@ from .models import Cattle
 from django.views import View
 from django.urls import reverse, reverse_lazy
 from .groups import GroupsManagement, GroupNumbers
+from datetime import datetime
 
 
 def calculate_cattle_age(birth_date, estimation_date):
@@ -56,6 +56,29 @@ def home(request):
     return render(request, 'my_farm/my_farm_main.html', context)
 
 
+def calculate_age_group(birth_date, estimation_date, gender):
+
+    age_in_months = calculate_cattle_age(birth_date, estimation_date)
+    print(age_in_months)
+    if gender in 'Cows':
+        return 'Cows'
+    if gender in ['Heifer', 'Bull']:
+        if age_in_months < 12:
+            return 'Calves'
+    if gender in 'Bull':
+        if 12 <= age_in_months < 24:
+            return 'Young Bull'
+        if age_in_months >= 24:
+            return 'Adult Bull'
+    if gender == 'Heifer':
+        if 12 <= age_in_months < 24:
+            return 'Young Heifer'
+        if age_in_months >= 24:
+            return 'Adult Heifer'
+
+    return 'Unknown'
+
+
 def cattle_info(request):
     cattle = Cattle.objects.filter(deleted=False)
     paginator = Paginator(cattle, 3)  # Show 3 cattle per page
@@ -63,12 +86,17 @@ def cattle_info(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    for cow in page_obj:
+        cow.age_group = calculate_age_group(cow.birth_date, date.today(), cow.gender)
+        print(cow.age_group)
+
+    # print(cow.age_group)
     context = {
         'cattle': page_obj,
     }
 
     # Get a list of all the columns in the Cattle model
-    all_columns = ['ID', 'Type', 'Number', 'Name', 'Gender', 'Breed', 'Birth Date',
+    all_columns = ['ID', 'Type', 'Number', 'Name', 'Gender', 'Age Group', 'Breed', 'Birth Date',
                    'Acquisition Method', 'Entry Date', 'Loss Method', 'End Date', 'Comments']
 
     if request.method == 'POST':
@@ -82,6 +110,7 @@ def cattle_info(request):
                 'Number': 'number',
                 'Name': 'name',
                 'Gender': 'gender',
+                'Age Group': 'age_group',
                 'Breed': 'breed',
                 'Birth Date': 'birth_date',
                 'Acquisition Method': 'acquisition_method',
@@ -131,7 +160,7 @@ def update_cattle(request, cattle_id=None):
     else:
         form = CattleForm(instance=cattle)
 
-    context = {'form': form}
+    context = {'form': form, 'cattle': cattle}
     return render(request, 'my_farm/update_cattle.html', context)
 
 
@@ -197,7 +226,10 @@ def search_cattle(request):
     else:
         cattle_list = Cattle.objects.filter(deleted=False)
 
-    context = {'cattle_list': cattle_list}
+    context = {
+        'cattle_list': cattle_list,
+        'query': query,
+    }
     return render(request, 'my_farm/search_cattle.html', context)
 
 

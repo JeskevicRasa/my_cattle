@@ -3,12 +3,12 @@
 {% block content %}
   {% load static %}
 
-<div class="grey-bg container-fluid mt-3 mb-3">
+<div class="container-fluid mt-3 mb-3">
   <section id="summary">
     <div class="row">
       <div class="col-12 mt-3 mb-1">
         <h4 class="text-uppercase">Your farm summary</h4>
-        <div style="height: 20px;"></div> <!-- Add a gap of 20 pixels -->
+        <div style="height: 20px;"></div>
       </div>
     </div>
     <div class="row">
@@ -33,24 +33,27 @@
       </div>
 
         <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card mb-3">
-            <div class="card-content">
-              <div class="card-body">
-                <div class="media d-flex">
-                  <div class="align-self-center">
-                    <img src="{% static 'img/cow3.png' %}" width="60" height="60" alt="Cow Icon">
-                  </div>
-                  <div class="media-body text-center">
-                    <h3>{{ total_cows }}</h3>
-                    <span>Cows</span>
-                  </div>
-                </div>
-              </div>
+  <a href="{% url 'my_farm:search_cattle' %}?query=Cows">
+    <div class="card mb-3">
+      <div class="card-content">
+        <div class="card-body">
+          <div class="media d-flex">
+            <div class="align-self-center">
+              <img src="{% static 'img/cow3.png' %}" width="60" height="60" alt="Cow Icon">
+            </div>
+            <div class="media-body text-center">
+              <h3>{{ total_cows }}</h3>
+              <span>Cows</span>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </a>
+</div>
 
         <div class="col-xl-3 col-sm-6 col-12">
+           <a href="{% url 'my_farm:search_cattle' %}?query=Calves">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
@@ -66,6 +69,7 @@
               </div>
             </div>
           </div>
+           </a>
         </div>
 
         <div class="col-xl-3 col-sm-6 col-12">

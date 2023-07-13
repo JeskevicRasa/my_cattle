@@ -157,6 +157,7 @@ class GroupsManagement:
                 and cattle['entry_date'] <= estimation_date],
         }
 
+        # print(groups)
         return groups
 
     def add_group(self, group_name, estimation_date):

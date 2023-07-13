@@ -3,14 +3,19 @@
 
 
 <body>
-    <h3>Search cattle</h3>
 
-    <form method="GET" action="{% url 'my_farm:search_cattle' %}">
-        <input type="text" name="query" value="{{ query }}" placeholder="Search by name">
-        <button type="submit">Search</button>
-    </form>
+<p></p>
 
-    <h4>Search Results:</h4>
+<form method="GET" action="{% url 'my_farm:search_cattle' %}">
+    <input type="text" name="query" value="{{ query }}" placeholder="Search Cattle">
+    <button type="submit">Search</button>
+</form>
+
+
+    <h3 style="text-align: left; margin: 20px;">{{ query }} search</h3>
+
+
+
     <div class="table-responsive">
         <div class="table-container">
             <table class="table table-bordered">

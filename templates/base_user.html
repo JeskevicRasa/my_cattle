@@ -18,7 +18,8 @@
 <link rel="stylesheet" href="{% static 'css/table_styles.css' %}">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
 
     <!-- Messages -->
@@ -31,34 +32,43 @@
 {% endif %}
 
 
-    <!-- Navigation -->
-    {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg static-top navbar-custom">
-        <div class="container">
-            <a class="navbar-brand nav-link my-cattle-link" href="{% url 'my_farm:home' %}">My Cattle</a>
+<!-- Navigation -->
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">My profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
+<nav class="navbar navbar-expand-lg static-top navbar-custom">
+    <div class="container">
+        <a class="navbar-brand nav-link my-cattle-link" href="{% url 'my_farm:home' %}">My Cattle</a>
+        {% if user.is_authenticated %}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                    {% endif %}
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
 
-                </ul>
-
-            </div>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        My farm
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'my_farm:add_row' %}">Add Cattle</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'my_farm:cattle_info' %}">Cattle Management</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'my_farm:generate_report' %}">Movement report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'profile' %}">Account</a>
+                    </div>
+                </li>
+                                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
         </div>
-    </nav>
-
-
+    </div>
+</nav>
+{% endif %}
 
     <!-- Page Content -->
 
@@ -130,7 +140,18 @@
 
   .btn-custom:hover {
     background-color: #008288;
+    color: #444444;
   }
+
+  .dropdown-divider {
+    border-top: 1px solid #ccc;
+    margin: 4px 0;
+    }
+
+  .dropdown-item:hover {
+    background-color: #444444;
+    color: #ffffff;
+    }
 </style>
 
 

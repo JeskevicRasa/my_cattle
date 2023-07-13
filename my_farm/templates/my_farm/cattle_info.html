@@ -47,47 +47,51 @@
     <input type="checkbox" name="columns" value="comments" id="id_comments" checked>
     <button type="submit">Apply</button>
 </form>
-  <table id="cattle-table" class="table table-bordered">
-      <thead>
-        <tr class="column-names">
-          <th class="cattle-type">Type</th>
-          <th class="cattle-number">Number</th>
-          <th class="cattle-name">Name</th>
-          <th class="cattle-gender">Gender</th>
-          <th class="cattle-breed">Breed</th>
-          <th class="cattle-birth_date">Birth date</th>
-          <th class="cattle-acquisition_method">Acquisition method</th>
-          <th class="cattle-entry_date">Entry date</th>
-          <th class="cattle-loss_method">Loss method</th>
-          <th class="cattle-end_date">End date</th>
-          <th class="cattle-comments">Comments</th>
-        </tr>
-      </thead>
-    <tbody>
+
+
+<table id="cattle-table" class="table table-bordered">
+  <thead>
+    <tr class="column-names">
+      <th class="cattle-type">Type</th>
+      <th class="cattle-number">Number</th>
+      <th class="cattle-name">Name</th>
+      <th class="cattle-gender">Gender</th>
+      <th class="cattle-age_group">Age Group</th>
+      <th class="cattle-breed">Breed</th>
+      <th class="cattle-birth_date">Birth date</th>
+      <th class="cattle-acquisition_method">Acquisition method</th>
+      <th class="cattle-entry_date">Entry date</th>
+      <th class="cattle-loss_method">Loss method</th>
+      <th class="cattle-end_date">End date</th>
+      <th class="cattle-comments">Comments</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for cow in cattle %}
-        <tr>
-          <td class="cattle-type">{{ cow.type }}</td>
-          <td>
-                  <a class="cattle-number" href="{% url 'my_farm:one_cattle_info' cow.id %}">{{ cow.number }}</a>
-          </td>
-          <td class="cattle-name">{{ cow.name }}</td>
-          <td class="cattle-gender">{{ cow.gender }}</td>
-          <td class="cattle-breed">{{ cow.breed }}</td>
-          <td class="cattle-birth_date">{{ cow.birth_date|date:"Y-m-d" }}</td>
-          <td class="cattle-acquisition_method">{{ cow.acquisition_method }}</td>
-          <td class="cattle-entry_date">{{ cow.entry_date|date:"Y-m-d" }}</td>
-          <td class="cattle-loss_method">{{ cow.loss_method }}</td>
-          <td class="cattle-end_date">{{ cow.end_date|date:"Y-m-d" }}</td>
-          <td class="cattle-comments">
-            <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:20 }}</div>
-            <div id="comments-full-{{ cow.id }}" style="display: none;">{{ cow.comments }}</div>
-            <a href="#" data-cow-id="{{ cow.id }}" data-action="show-more" onclick="showFullComments({{ cow.id }}); return false;">Show More</a>
-            <a href="#" data-cow-id="{{ cow.id }}" data-action="show-less" onclick="showShortComments({{ cow.id }}); return false;" style="display: none;">Show Less</a>
-          </td>
-        </tr>
+    <tr>
+      <td class="cattle-type">{{ cow.type }}</td>
+      <td class="cattle-number">
+        <a href="{% url 'my_farm:one_cattle_info' cow.id %}">{{ cow.number }}</a>
+      </td>
+      <td class="cattle-name">{{ cow.name }}</td>
+      <td class="cattle-gender">{{ cow.gender }}</td>
+      <td class="cattle-age_group">{{ cow.age_group }}</td>
+      <td class="cattle-breed">{{ cow.breed }}</td>
+      <td class="cattle-birth_date">{{ cow.birth_date|date:"Y-m-d" }}</td>
+      <td class="cattle-acquisition_method">{{ cow.acquisition_method }}</td>
+      <td class="cattle-entry_date">{{ cow.entry_date|date:"Y-m-d" }}</td>
+      <td class="cattle-loss_method">{{ cow.loss_method }}</td>
+      <td class="cattle-end_date">{{ cow.end_date|date:"Y-m-d" }}</td>
+      <td class="cattle-comments">
+        <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:20 }}</div>
+        <div id="comments-full-{{ cow.id }}" style="display: none;">{{ cow.comments }}</div>
+        <a href="#" data-cow-id="{{ cow.id }}" data-action="show-more" onclick="showFullComments({{ cow.id }}); return false;">Show More</a>
+        <a href="#" data-cow-id="{{ cow.id }}" data-action="show-less" onclick="showShortComments({{ cow.id }}); return false;" style="display: none;">Show Less</a>
+      </td>
+    </tr>
     {% endfor %}
-    </tbody>
-  </table>
+  </tbody>
+</table>
 
     {% if cattle.has_other_pages %}
         <div class="pagination justify-content-center">

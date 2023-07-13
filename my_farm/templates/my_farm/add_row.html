@@ -1,100 +1,64 @@
 {% extends 'base_user.html' %}
 {% block content %}
+{% load static %}
 
 <head>
   <title>Add Cattle Information</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <style>
-    .card {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    input[type="text"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-
-    select {
-      appearance: none;
-      background-color: #ffffff;
-      background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
-      background-repeat: no-repeat;
-      border: 1px solid #ccc;
-      padding: 8px 20px;
-      cursor: pointer;
-    }
-
-
-    .errorlist {
-      display: none;
-    }
-  </style>
+<link rel="stylesheet" href="{% static 'css/form_styles.css' %}">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <h3 class="text-uppercase" style="text-align: center; margin: 20px;">Add Cattle</h3>
   <div class="card">
-    <form method="post">
-      {% csrf_token %}
-      <div class="form-group">
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
         <label for="{{ form.number.id_for_label }}">Number:</label>
         {{ form.number }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.name.id_for_label }}">Name:</label>
         {{ form.name }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.gender.id_for_label }}">Gender:</label>
         {{ form.gender }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.breed.id_for_label }}">Breed:</label>
         {{ form.breed }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.birth_date.id_for_label }}">Birth Date:</label>
         {{ form.birth_date }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.acquisition_method.id_for_label }}">Acquisition Method:</label>
         {{ form.acquisition_method }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.entry_date.id_for_label }}">Entry Date:</label>
         {{ form.entry_date }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.loss_method.id_for_label }}">Loss Method:</label>
         {{ form.loss_method }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.end_date.id_for_label }}">End Date:</label>
         {{ form.end_date }}
-      </div>
-      <div class="form-group">
+    </div>
+    <div class="form-group">
         <label for="{{ form.comments.id_for_label }}">Comments:</label>
         {{ form.comments }}
-      </div>
-      <button type="submit" class="btn btn-custom">Add cattle information</button>
-    </form>
+    </div>
+    <div class="form-group">
+        <label for="{{ form.picture.id_for_label }}">Picture:</label>
+        {{ form.picture }}
+    </div>
+    <button type="submit" class="btn btn-custom">Add cattle information</button>
+</form>
   </div>
   <script>
     flatpickr("#id_birth_date, #id_entry_date, #id_end_date", {

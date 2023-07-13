@@ -101,8 +101,6 @@ class GroupNumbers:
                      item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in end_date_list] and
                      item not in self.filter_acquisition_loss_dates]
 
-        print(moved_out)
-
         moved_in = [item for item in end_date_list if
                     item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in start_date_list] and
                     item not in self.filter_acquisition_loss_dates]
@@ -157,7 +155,7 @@ class GroupsManagement:
                 and cattle['entry_date'] <= estimation_date],
         }
 
-        # print(groups)
+        print(groups)
         return groups
 
     def add_group(self, group_name, estimation_date):

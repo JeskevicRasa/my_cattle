@@ -1,11 +1,13 @@
 {% extends 'base_user.html' %}
 
 {% block content %}
-  <h2>Confirm Delete</h2>
-  <p>Are you sure you want to delete this cow?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-secondary">Cancel</a>
-  </form>
+  <div class="card" style="max-width: 400px; margin: 20px auto; padding: 20px;">
+    <h3 style="text-align: left; margin-top: 20px;">Confirm Delete</h3>
+    <p>Are you sure you want to delete this cattle?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-secondary" style="margin-left: 10px;">Cancel</a>
+    </form>
+  </div>
 {% endblock %}

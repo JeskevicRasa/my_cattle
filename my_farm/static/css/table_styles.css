@@ -2,7 +2,7 @@
 
 
     .table-bordered tbody tr:hover {
-      background-color: #f2f2f2;
+      background-color: #e8e8e8;
     }
 
     .table-bordered thead tr.column-names {
@@ -21,7 +21,7 @@
     .table-bordered {
       font-size: 16px;
       padding: 5px;
-      max-width: 800px; /* Adjust the max-width as needed */
+      max-width: auto; /* Adjust the max-width as needed */
     }
 
     /* Custom table styling */
@@ -29,16 +29,28 @@
       color: #444444;
     }
 
-    .table-bordered th,
-    .table-bordered td {
-      border: 1px solid #e2e2e2;
-    }
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #b8b8b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
     .table-bordered thead th {
-      background-color: #ededed;
-      border-bottom-color: #d5d5d5;
+      background-color: #d4d3cd;
+      border-bottom-color: #b8b8b8;
     }
 
     .report-info {
       margin: 20px;
+    }
+
+    .table-bordered a {
+        color: blue; /* Set link color to blue */
+        text-decoration: underline; /* Add underline to links */
+    }
+
+    .table-bordered a:hover {
+        color: #2a5298; /* Change link color on hover */
     }

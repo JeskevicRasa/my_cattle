@@ -23,7 +23,6 @@ def calculate_cattle_age(birth_date, estimation_date):
 
 
 def calculate_cattle(estimation_date):
-
     cattle = Cattle.objects.filter(deleted=False)
     total_cattle = cattle.count()
     age_list = []
@@ -160,7 +159,7 @@ def upload_picture(request, cattle_id):
 class CattleDeleteView(DeleteView):
     model = Cattle
     template_name = 'my_farm/cattle_confirm_delete.html'  # Update with the appropriate template name
-    success_url = reverse_lazy('my_farm:one_cattle_info')  # Updated URL pattern name
+    success_url = reverse_lazy('my_farm:cattle_info')  # Updated URL pattern name
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
@@ -204,6 +203,7 @@ def search_cattle(request):
 
 class GenerateReportView(View):
     generate_report_template = 'my_farm/generate_report.html'
+
     def __init__(self):
         self.start_date = None
         self.end_date = None

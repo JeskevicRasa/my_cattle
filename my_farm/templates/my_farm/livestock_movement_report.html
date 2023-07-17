@@ -1,93 +1,193 @@
 {% extends 'base_user.html' %}
 {% block content %}
 
+{% load json_filters %}
+
 
   <div class="report-info">
     <p>Reporting Start Date: {{ start_date }}</p>
     <p>Reporting End Date: {{ end_date }}</p>
+    <a href="{% url 'my_farm:generate_pdf' %}">Download PDF</a>
   </div>
-
-  <div class="table-responsive">
-    <div class="table-container">
-      <table class="table table-bordered">
-        <thead>
-          <tr class="column-names">
-            <th rowspan="3">Group Name</th>
-            <th class="border-column" colspan="2" rowspan="2">Beginning of period</th>
-            <th class="border-column" colspan="2" rowspan="2">Births</th>
-            <th class="border-column" colspan="2" rowspan="2">Purchases</th>
-            <th class="border-column" colspan="2" rowspan="2">Gifts</th>
-            <th colspan="4">Movement between groups</th>
-            <th colspan="2" rowspan="2">Deaths</th>
-            <th colspan="2" rowspan="2">Sold</th>
-            <th colspan="2" rowspan="2">Consumed</th>
-            <th colspan="2" rowspan="2">Gifted</th>
-            <th colspan="2" rowspan="2">End of period</th>
-            <th colspan="2" rowspan="2">Difference</th>
-          </tr>
-          <tr>
-            <th colspan="2">To</th>
-            <th colspan="2">From</th>
-          </tr>
-          <tr>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-            <th>pcs</th>
-            <th>kg</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for group in groups %}
+   <ul>
+    <div class="table-responsive">
+      <div class="table-container">
+        <table class="table table-bordered">
+          <thead>
+            <tr class="column-names">
+              <th rowspan="3">Group Name</th>
+              <th class="border-column" colspan="2" rowspan="2">Beginning of period</th>
+              <th class="border-column" colspan="2" rowspan="2">Births</th>
+              <th class="border-column" colspan="2" rowspan="2">Purchases</th>
+              <th class="border-column" colspan="2" rowspan="2">Gifts</th>
+              <th colspan="4">Movement between groups</th>
+              <th colspan="2" rowspan="2">Deaths</th>
+              <th colspan="2" rowspan="2">Sold</th>
+              <th colspan="2" rowspan="2">Consumed</th>
+              <th colspan="2" rowspan="2">Gifted</th>
+              <th colspan="2" rowspan="2">End of period</th>
+              <th colspan="2" rowspan="2">Difference</th>
+            </tr>
+            <tr>
+              <th colspan="2">To</th>
+              <th colspan="2">From</th>
+            </tr>
+            <tr>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+              <th>pcs</th>
+              <th>kg</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for group in groups %}
             <tr>
               <td>{{ group.group_name }}</td>
-              <td>{% if group.start_date_count == 0 %}{% else %}{{ group.start_date_count }}{% endif %}</td>
-              <td>{% if group.start_date_group_weight == 0 %}{% else %}{{ group.start_date_group_weight }}{% endif %}</td>
-              <td>{% if group.birth_count == 0 %}{% else %}{{ group.birth_count }}{% endif %}</td>
-              <td>{% if group.birth_weight == 0 %}{% else %}{{ group.birth_weight }}{% endif %}</td>
-              <td>{% if group.purchase_count == 0 %}{% else %}{{ group.purchase_count }}{% endif %}</td>
-              <td>{% if group.purchase_weight == 0 %}{% else %}{{ group.purchase_weight }}{% endif %}</td>
-              <td>{% if group.gift_count == 0 %}{% else %}{{ group.gift_count }}{% endif %}</td>
-              <td>{% if group.gift_weight == 0 %}{% else %}{{ group.gift_weight }}{% endif %}</td>
-              <td>{% if group.moved_in == 0 %}{% else %}{{ group.moved_in }}{% endif %}</td>
-              <td>{% if group.weight_moved_in == 0 %}{% else %}{{ group.weight_moved_in }}{% endif %}</td>
-              <td>{% if group.moved_out == 0 %}{% else %}{{ group.moved_out }}{% endif %}</td>
-              <td>{% if group.weight_moved_out == 0 %}{% else %}{{ group.weight_moved_out }}{% endif %}</td>
-              <td>{% if group.death_count == 0 %}{% else %}{{ group.death_count }}{% endif %}</td>
-              <td>{% if group.death_weight == 0 %}{% else %}{{ group.death_weight }}{% endif %}</td>
-              <td>{% if group.sold_count == 0 %}{% else %}{{ group.sold_count }}{% endif %}</td>
-              <td>{% if group.sold_weight == 0 %}{% else %}{{ group.sold_weight }}{% endif %}</td>
-              <td>{% if group.consumed_count == 0 %}{% else %}{{ group.consumed_count }}{% endif %}</td>
-              <td>{% if group.consumed_weight == 0 %}{% else %}{{ group.consumed_weight }}{% endif %}</td>
-              <td>{% if group.gifted_count == 0 %}{% else %}{{ group.gifted_count }}{% endif %}</td>
-              <td>{% if group.gifted_weight == 0 %}{% else %}{{ group.gifted_weight }}{% endif %}</td>
-              <td>{% if group.end_date_count == 0 %}{% else %}{{ group.end_date_count }}{% endif %}</td>
-              <td>{% if group.end_date_group_weight == 0 %}{% else %}{{ group.end_date_group_weight }}{% endif %}</td>
-              <td>{% if group.count_difference == 0 %}{% else %}{{ group.count_difference }}{% endif %}</td>
-              <td>{% if group.weight_difference == 0 %}{% else %}{{ group.weight_difference }}{% endif %}</td>
+              <td>{% if group.start_date_count > 0 %}{{ group.start_date_count }}{% endif %}</td>
+              <td>{% if group.start_date_group_weight > 0 %}{{ group.start_date_group_weight }}{% endif %}</td>
+              <td>{% if group.birth_count > 0 %}{{ group.birth_count }}{% endif %}</td>
+              <td>{% if group.birth_weight > 0 %}{{ group.birth_weight }}{% endif %}</td>
+              <td>{% if group.purchase_count > 0 %}{{ group.purchase_count }}{% endif %}</td>
+              <td>{% if group.purchase_weight > 0 %}{{ group.purchase_weight }}{% endif %}</td>
+              <td>{% if group.gift_count > 0 %}{{ group.gift_count }}{% endif %}</td>
+              <td>{% if group.gift_weight > 0 %}{{ group.gift_weight }}{% endif %}</td>
+              <td>{% if group.moved_in > 0 %}{{ group.moved_in }}{% endif %}</td>
+              <td>{% if group.weight_moved_in > 0 %}{{ group.weight_moved_in }}{% endif %}</td>
+              <td>{% if group.moved_out > 0 %}{{ group.moved_out }}{% endif %}</td>
+              <td>{% if group.weight_moved_out > 0 %}{{ group.weight_moved_out }}{% endif %}</td>
+              <td>{% if group.death_count > 0 %}{{ group.death_count }}{% endif %}</td>
+              <td>{% if group.death_weight > 0 %}{{ group.death_weight }}{% endif %}</td>
+              <td>{% if group.sold_count > 0 %}{{ group.sold_count }}{% endif %}</td>
+              <td>{% if group.sold_weight > 0 %}{{ group.sold_weight }}{% endif %}</td>
+              <td>{% if group.consumed_count > 0 %}{{ group.consumed_count }}{% endif %}</td>
+              <td>{% if group.consumed_weight > 0 %}{{ group.consumed_weight }}{% endif %}</td>
+              <td>{% if group.gifted_count > 0 %}{{ group.gifted_count }}{% endif %}</td>
+              <td>{% if group.gifted_weight > 0 %}{{ group.gifted_weight }}{% endif %}</td>
+              <td>{% if group.end_date_count > 0 %}{{ group.end_date_count }}{% endif %}</td>
+              <td>{% if group.end_date_group_weight > 0 %}{{ group.end_date_group_weight }}{% endif %}</td>
+              <td>{% if group.count_difference > 0 %}{{ group.count_difference }}{% endif %}</td>
+              <td>{% if group.weight_difference > 0 %}{{ group.weight_difference }}{% endif %}</td>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  </ul>
+{% if last_reports %}
+  <h2>Last Reports</h2>
+  <ul>
+    {% for last_report in last_reports %}
+      <li>
+        <h3>{{ last_report.title }}</h3>
+        <h4>Report Formation Date: {{ last_report.generated_date }}</h4>
+        <div class="table-responsive">
+          <div class="table-container">
+            <table class="table table-bordered">
+              <!-- Table headers for last report data -->
+              <thead>
+                <tr class="column-names">
+                  <th rowspan="3">Group Name</th>
+                  <th class="border-column" colspan="2" rowspan="2">Beginning of period</th>
+                  <th class="border-column" colspan="2" rowspan="2">Births</th>
+                  <th class="border-column" colspan="2" rowspan="2">Purchases</th>
+                  <th class="border-column" colspan="2" rowspan="2">Gifts</th>
+                  <th colspan="4">Movement between groups</th>
+                  <th colspan="2" rowspan="2">Deaths</th>
+                  <th colspan="2" rowspan="2">Sold</th>
+                  <th colspan="2" rowspan="2">Consumed</th>
+                  <th colspan="2" rowspan="2">Gifted</th>
+                  <th colspan="2" rowspan="2">End of period</th>
+                  <th colspan="2" rowspan="2">Difference</th>
+                </tr>
+                <tr>
+                  <th colspan="2">To</th>
+                  <th colspan="2">From</th>
+                </tr>
+                <tr>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                  <th>pcs</th>
+                  <th>kg</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for group in last_report.report_data|safe|json_loads %}
+                  <tr>
+                    <td>{{ group.group_name }}</td>
+                    <td>{% if group.start_date_count == '0' %}{% else %}{{ group.start_date_count }}{% endif %}</td>
+                    <td>{% if group.start_date_group_weight == '0' %}{% else %}{{ group.start_date_group_weight }}{% endif %}</td>
+                    <td>{% if group.birth_count == '0' %}{% else %}{{ group.birth_count }}{% endif %}</td>
+                    <td>{% if group.birth_weight == '0' %}{% else %}{{ group.birth_weight }}{% endif %}</td>
+                    <td>{% if group.purchase_count == '0' %}{% else %}{{ group.purchase_count }}{% endif %}</td>
+                    <td>{% if group.purchase_weight == '0' %}{% else %}{{ group.purchase_weight }}{% endif %}</td>
+                    <td>{% if group.gift_count == '0' %}{% else %}{{ group.gift_count }}{% endif %}</td>
+                    <td>{% if group.gift_weight == '0' %}{% else %}{{ group.gift_weight }}{% endif %}</td>
+                    <td>{% if group.moved_in == '0' or group.moved_in == 0 %}{% else %}{{ group.moved_in }}{% endif %}</td>
+                    <td>{% if group.weight_moved_in == '0' or group.weight_moved_in == 0 %}{% else %}{{ group.weight_moved_in }}{% endif %}</td>
+                    <td>{% if group.moved_out == '0' or group.moved_out == 0 %}{% else %}{{ group.moved_out }}{% endif %}</td>
+                    <td>{% if group.weight_moved_out == '0' or group.weight_moved_out == 0 %}{% else %}{{ group.weight_moved_out }}{% endif %}</td>
+                    <td>{% if group.death_count == '0' %}{% else %}{{ group.death_count }}{% endif %}</td>
+                    <td>{% if group.death_weight == '0' %}{% else %}{{ group.death_weight }}{% endif %}</td>
+                    <td>{% if group.sold_count == '0' %}{% else %}{{ group.sold_count }}{% endif %}</td>
+                    <td>{% if group.sold_weight == '0' %}{% else %}{{ group.sold_weight }}{% endif %}</td>
+                    <td>{% if group.consumed_count == '0' %}{% else %}{{ group.consumed_count }}{% endif %}</td>
+                    <td>{% if group.consumed_weight == '0' %}{% else %}{{ group.consumed_weight }}{% endif %}</td>
+                    <td>{% if group.gifted_count == '0' %}{% else %}{{ group.gifted_count }}{% endif %}</td>
+                    <td>{% if group.gifted_weight == '0' %}{% else %}{{ group.gifted_weight }}{% endif %}</td>
+                    <td>{% if group.end_date_count == '0' %}{% else %}{{ group.end_date_count }}{% endif %}</td>
+                    <td>{% if group.end_date_group_weight == '0' %}{% else %}{{ group.end_date_group_weight }}{% endif %}</td>
+                    <td>{% if group.count_difference == '0' %}{% else %}{{ group.count_difference }}{% endif %}</td>
+                    <td>{% if group.weight_difference == '0' %}{% else %}{{ group.weight_difference }}{% endif %}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 {% endblock %}

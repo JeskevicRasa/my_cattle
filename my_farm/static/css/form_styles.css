@@ -38,3 +38,15 @@
     .errorlist {
       display: none;
     }
+
+    .center-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 10vh;
+    }
+
+    .btn-custom {
+      display: inline-block;
+      margin-top: 20px;
+}

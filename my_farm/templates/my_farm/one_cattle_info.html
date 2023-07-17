@@ -13,9 +13,14 @@
                     {% else %}
                         No picture available.
                     {% endif %}
-                    <a href="{% url 'my_farm:upload_picture' cattle_id=cattle.id %}">Upload Picture</a>
+
                 </td>
             </tr>
+            <tr>
+                <th></th>
+                <td><a href="{% url 'my_farm:upload_picture' cattle_id=cattle.id %}">Upload Picture</a></td>
+            </tr>
+            <tr></tr>
             <tr>
                 <th>Type</th>
                 <td>{{ cattle.type }}</td>
@@ -77,7 +82,9 @@
         </table>
 
     <div style="height: 20px;"></div>
-    <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-custom" >Back to Cattle Info</a>
+    <div class="center-container">
+      <a href="{% url 'my_farm:cattle_info' %}" class="btn-custom">Back to Cattle Info</a>
+    </div>
     <div style="height: 20px;"></div>  <!-- Empty div for spacing -->
 
     {% else %}

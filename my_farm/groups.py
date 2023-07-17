@@ -113,6 +113,43 @@ class GroupNumbers:
         self.weight_moved_in = round(sum(item.get('weight', 0) for item in moved_in), 2)
         self.weight_moved_out = round(sum(item.get('weight', 0) for item in moved_out), 2)
 
+    def to_dict(self, start_date=None, end_date=None):
+        data = {
+            'group_name': self.group_name,
+            'group_data': self.group_data,
+            'start_date_count': str(self.start_date_count),
+            'end_date_count': str(self.end_date_count),
+            'count_difference': str(self.count_difference),
+            'start_date_group_weight': str(self.start_date_group_weight),
+            'end_date_group_weight': str(self.end_date_group_weight),
+            'weight_difference': str(self.weight_difference),
+            'birth_count': str(self.birth_count),
+            'birth_weight': str(self.birth_weight),
+            'purchase_count': str(self.purchase_count),
+            'purchase_weight': str(self.purchase_weight),
+            'gift_count': str(self.gift_count),
+            'gift_weight': str(self.gift_weight),
+            'death_count': str(self.death_count),
+            'death_weight': str(self.death_weight),
+            'sold_count': str(self.sold_count),
+            'sold_weight': str(self.sold_weight),
+            'consumed_count': str(self.consumed_count),
+            'consumed_weight': str(self.consumed_weight),
+            'gifted_count': str(self.gifted_count),
+            'gifted_weight': str(self.gifted_weight),
+            'moved_in': self.moved_in,
+            'moved_out': self.moved_out,
+            'weight_moved_in': self.weight_moved_in,
+            'weight_moved_out': self.weight_moved_out,
+        }
+
+        if start_date:
+            data['start_date'] = start_date.isoformat()
+        if end_date:
+            data['end_date'] = end_date.isoformat()
+
+        return data
+
 
 class GroupsManagement:
     def __init__(self):

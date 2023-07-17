@@ -54,3 +54,29 @@
     .table-bordered a:hover {
         color: #2a5298; /* Change link color on hover */
     }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .table-container {
+      display: inline-block;
+      min-width: 100%;
+    }
+
+    .table-bordered {
+      width: max-content;
+    }
+
+    .center-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 10vh;
+    }
+
+    .btn-custom {
+      display: inline-block;
+      margin-top: 20px;
+    }

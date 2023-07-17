@@ -1,16 +1,25 @@
+from selenium.webdriver.support import expected_conditions as EC
+from selenium import webdriver
+
 from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import date, datetime
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DeleteView
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+
 from my_cattle.forms import GenderForm, CattleForm
-from .models import Cattle
+from .models import Cattle, CattleMovementReport
 from django.views import View
 from django.urls import reverse, reverse_lazy
 from .groups import GroupsManagement, GroupNumbers
-from datetime import datetime
+import json
+import io
+from django.http import HttpResponse
+from .constants import MAX_REPORTS
 
 
 def calculate_cattle_age(birth_date, estimation_date):
@@ -80,8 +89,14 @@ def calculate_age_group(birth_date, estimation_date, gender):
 
 
 def cattle_info(request):
+    """
+    Retrieves cattle information and handles column selection for display.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the cattle information displayed.
+    """
     cattle = Cattle.objects.filter(deleted=False)
-    paginator = Paginator(cattle, 3)  # Show 3 cattle per page
+    paginator = Paginator(cattle, 5)  # Show 3 cattle per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -139,8 +154,14 @@ def cattle_info(request):
 
 
 def add_row(request):
+    """
+    Adds a new row to the cattle table based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     if request.method == 'POST':
-        form = GenderForm(request.POST)
+        form = GenderForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('my_farm:cattle_info')
@@ -150,21 +171,35 @@ def add_row(request):
 
 
 def update_cattle(request, cattle_id=None):
+    """
+    Updates the information of a specific cattle based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to be updated.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
 
     if request.method == 'POST':
-        form = CattleForm(request.POST, request.FILES, instance=cattle)
+        form = GenderForm(request.POST, request.FILES, instance=cattle)
         if form.is_valid():
             form.save()
             return redirect('my_farm:one_cattle_info', cattle_id=cattle_id)
     else:
-        form = CattleForm(instance=cattle)
+        form = GenderForm(instance=cattle)
 
     context = {'form': form, 'cattle': cattle}
     return render(request, 'my_farm/update_cattle.html', context)
 
 
 def one_cattle_info(request, cattle_id=None):
+    """
+    Displays detailed information about a specific cattle.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to display information about.
+    :return: The rendered HTTP response with the cattle information.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
 
     context = {'cattle': cattle}
@@ -172,6 +207,13 @@ def one_cattle_info(request, cattle_id=None):
 
 
 def upload_picture(request, cattle_id):
+    """
+    Handles the uploading of a picture for a specific cattle.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to upload a picture for.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id)
 
     if request.method == 'POST':
@@ -186,6 +228,21 @@ def upload_picture(request, cattle_id):
 
 
 class CattleDeleteView(DeleteView):
+    """
+    This class is responsible for deleting a cattle object. It inherits from the DeleteView class provided
+    by the Django framework. Upon deletion, it redirects to the cattle_info page.
+
+    Attributes:
+    model: The model to be deleted (Cattle).
+    template_name: The name of the template used for the confirmation page.
+    success_url: The URL to redirect to after successful deletion.
+
+    Methods:
+    get_object(self, queryset=None): Retrieves the cattle object to be deleted. If the cattle object
+    is already marked as deleted, it raises an Http404 exception.
+    post(self, request, *args, **kwargs): Handles the HTTP POST request for deleting the cattle object.
+    It calls the _delete() method on the cattle object and redirects to the success_url.
+    """
     model = Cattle
     template_name = 'my_farm/cattle_confirm_delete.html'  # Update with the appropriate template name
     success_url = reverse_lazy('my_farm:cattle_info')  # Updated URL pattern name
@@ -203,10 +260,23 @@ class CattleDeleteView(DeleteView):
 
 
 def confirmation_page(request):
+    """
+    Renders the confirmation_page.html template.
+
+    :param request: The HTTP request object.
+    :return: The rendered confirmation page.
+    """
     return render(request, 'my_farm/confirmation_page.html')
 
 
 def search_cattle(request):
+    """
+    Performs a search query on the Cattle model based on the provided query parameter.
+    It filters the cattle_list based on various fields and renders the search_cattle.html template.
+
+    :param request: The HTTP request object.
+    :return: The rendered search_cattle page with the filtered cattle_list and query parameter as context.
+    """
     query = request.GET.get('query')
     if query:
         cattle_list = Cattle.objects.filter(deleted=False).filter(
@@ -234,36 +304,107 @@ def search_cattle(request):
 
 
 class GenerateReportView(View):
+    """
+    A view class for generating a report.
+
+    Inherits from View.
+
+    Attributes:
+        generate_report_template (str): The template for rendering the generate report page.
+
+    Methods:
+        __init__(): Initializes the class and sets initial values.
+        get(request): Handles the GET request for displaying the generate report page.
+        post(request): Handles the POST request for generating a report.
+    """
+
     generate_report_template = 'my_farm/generate_report.html'
 
     def __init__(self):
+        """
+        Initializes the GenerateReportView class.
+
+        Sets initial values for start_date and end_date attributes.
+
+        Calls the __init__ method of the super class.
+        """
+        super().__init__()
         self.start_date = None
         self.end_date = None
 
     def get(self, request):
+        """
+        Handles the GET request for displaying the generate report page.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: The rendered HTTP response for the generate report page.
+        """
         return render(request, self.generate_report_template)
 
     def post(self, request):
-        self.start_date = date.fromisoformat(request.POST.get('start_date'))
-        self.end_date = date.fromisoformat(request.POST.get('end_date'))
+        """
+        Handles the POST request for generating a report.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: The redirect HTTP response to the report page.
+        """
+        start_date = datetime.fromisoformat(request.POST.get('start_date')).date()
+        end_date = datetime.fromisoformat(request.POST.get('end_date')).date()
 
         # Store the data in session
         request.session['report_data'] = {
-            'start_date': self.start_date.isoformat(),
-            'end_date': self.end_date.isoformat(),
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
         }
 
-        return redirect(reverse('my_farm:report'))
+        return redirect('my_farm:report')
 
 
-class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReportView, View):
+class LivestockMovementReportView(GroupsManagement, GenerateReportView, View):
+    """
+    A view class for generating and displaying the livestock movement report.
+
+    Inherits from GroupsManagement, GenerateReportView, and View.
+
+    Attributes:
+        report_template (str): The template for rendering the report.
+
+    Methods:
+        __init__(): Initializes the class and sets initial values.
+        load_report_data(request): Loads the report data from the session.
+        get(request): Handles the GET request for generating and displaying the report.
+    """
+
     report_template = 'my_farm/livestock_movement_report.html'
 
     def __init__(self):
-        super().__init__()
+        """
+        Initializes the LivestockMovementReportView class.
+
+        Calls the __init__ methods of the super classes and sets initial values for groups and encoder_class attributes.
+        """
+        super(GroupsManagement, self).__init__()
+        super(GenerateReportView, self).__init__()
+        super(View, self).__init__()
         self.groups = []
+        self.encoder_class = GroupNumbersEncoder
 
     def load_report_data(self, request):
+        """
+        Loads the report data from the session.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            bool: True if the report data is loaded successfully, False otherwise.
+        """
         report_data = request.session.get('report_data')
         if not report_data:
             return False
@@ -274,14 +415,23 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
         return True
 
     def get(self, request):
+        """
+        Handles the GET request for generating and displaying the livestock movement report.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: The rendered HTTP response with the generated report.
+        """
         if not self.load_report_data(request):
             return redirect('my_farm:generate_report')
 
-        groups_manager = GroupsManagement
+        groups_manager = GroupsManagement()
 
-        estimation_date = groups_manager.calculate_groups(self, estimation_date=self.end_date)
-        start_date_groups = groups_manager.calculate_groups(self, estimation_date=self.start_date)
-        end_date_groups = groups_manager.calculate_groups(self, estimation_date=self.end_date)
+        estimation_date = groups_manager.calculate_groups(estimation_date=self.end_date)
+        start_date_groups = groups_manager.calculate_groups(estimation_date=self.start_date)
+        end_date_groups = groups_manager.calculate_groups(estimation_date=self.end_date)
 
         self.groups = []
         for group_name, cattle_data in estimation_date.items():
@@ -293,9 +443,92 @@ class LivestockMovementReportView(GroupsManagement, GroupNumbers, GenerateReport
             self.groups.append(group)
 
         context = {
-            'start_date': self.start_date,
-            'end_date': self.end_date,
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat(),
             'groups': self.groups,
         }
 
+        group_dicts = [group.to_dict() for group in self.groups]
+
+        # Check if the last reports URL is accessed
+        last_reports = CattleMovementReport.objects.order_by('-id')[1:4]
+
+        # Pass the last reports to the template
+        context['last_reports'] = last_reports
+
+        # Save the report data
+        report_data = json.dumps(group_dicts, cls=self.encoder_class, default=str)
+        report_title = f'Cattle Movement Report ({self.start_date.isoformat()} - {self.end_date.isoformat()})'
+        report = CattleMovementReport(title=report_title, report_data=report_data)
+        report.save()
+
+        all_reports = CattleMovementReport.objects.order_by('-id')
+
+        # Keep the most recent reports (MAX_REPORTS)
+        recent_reports = all_reports[:MAX_REPORTS]
+
+        # Delete reports that are not in the recent reports list
+        old_reports = all_reports.exclude(pk__in=recent_reports)
+        old_reports.delete()
+
+        # Pass the report ID to the template
+        context['report_id'] = report.pk
+
         return render(request, self.report_template, context)
+
+
+class GroupNumbersEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, GroupNumbers):
+            return obj.to_dict()
+        if isinstance(obj, date):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+def generate_pdf(request):
+    # Set up Selenium webdriver with Chrome options
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Run Chrome in headless mode
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+
+    # Initialize the Chrome webdriver
+    driver = webdriver.Chrome(options=options)
+
+    # Load the web page
+    driver.get('http://127.0.0.1:8000/my_farm/livestock_movement_report/')
+
+    # Wait for the report to load
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.container')))
+
+    # Take a screenshot of the web page
+    screenshot = driver.get_screenshot_as_png()
+
+    # Close the Selenium webdriver
+    driver.quit()
+
+    # Create an empty PDF file
+    pdf_file = io.BytesIO()
+
+    # Convert the screenshot image to PDF
+    from PIL import Image
+    img = Image.open(io.BytesIO(screenshot))
+    img.save(pdf_file, 'PDF')
+
+    # Set the PDF file content type and headers
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+
+    # Write the PDF file content to the response
+    response.write(pdf_file.getvalue())
+
+    return response

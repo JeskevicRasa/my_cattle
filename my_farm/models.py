@@ -64,3 +64,9 @@ class Cattle(models.Model):
 
     def __str__(self):
         return f'{self.name},  {self.gender}, {self.birth_date}'
+
+
+class CattleMovementReport(models.Model):
+    title = models.CharField(max_length=100)
+    generated_date = models.DateTimeField(auto_now_add=True)
+    report_data = models.JSONField()

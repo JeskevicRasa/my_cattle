@@ -1,7 +1,7 @@
 from django.urls import path
 # from .livestock_movement_report import LivestockMovementReportView
 from .views import home, cattle_info, add_row, confirmation_page, update_cattle, search_cattle, \
-    GenerateReportView, LivestockMovementReportView, CattleDeleteView, one_cattle_info, upload_picture
+    GenerateReportView, LivestockMovementReportView, CattleDeleteView, one_cattle_info, upload_picture, generate_pdf
 
 app_name = "my_farm"
 
@@ -17,4 +17,7 @@ urlpatterns = [
     path('confirmation_page/', confirmation_page, name='confirmation_page'),
     path('generate_report/', GenerateReportView.as_view(), name='generate_report'),
     path('livestock_movement_report/', LivestockMovementReportView.as_view(), name='report'),
+    path('livestock_movement_report/last_reports/', LivestockMovementReportView.as_view(), {'last_reports': True},
+         name='last_reports'),
+    path('generate_pdf/', generate_pdf, name='generate_pdf'),
 ]

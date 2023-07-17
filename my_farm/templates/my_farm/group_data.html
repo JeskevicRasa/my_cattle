@@ -1,0 +1,90 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+  <title>Group Data</title>
+
+  <h3 class="text-uppercase" style="text-align: center; margin: 30px;">Group Data - {{ selected_group }}</h3>
+
+  <div class="table-responsive">
+    <table id="group-data-table" class="table table-bordered">
+      <thead>
+        <tr class="column-names-groups">
+          <th>Type</th>
+          <th>Number</th>
+          <th>Name</th>
+          <th>Gender</th>
+          <th>Breed</th>
+          <th>Birth Date</th>
+          <th>Acquisition Method</th>
+          <th>Entry Date</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in groups %}
+          {% for cattle in group.group_data %}
+            <tr>
+              <td>{{ cattle.cattle.type }}</td>
+      <td class="cattle-number">
+        <a href="{% url 'my_farm:cattle_detail' cattle.cattle.id %}">{{ cattle.cattle.number }}</a>
+      </td>
+              <td>{{ cattle.cattle.name }}</td>
+              <td>{{ cattle.cattle.gender }}</td>
+              <td>{{ cattle.cattle.breed }}</td>
+              <td>{{ cattle.cattle.birth_date|date:"Y-m-d" }}</td>
+              <td>{{ cattle.cattle.acquisition_method }}</td>
+              <td>{{ cattle.cattle.entry_date|date:"Y-m-d" }}</td>
+              <td>
+                <div id="comments-short-{{ cattle.cattle.id }}">{{ cattle.cattle.comments|truncatechars:20 }}</div>
+                <div id="comments-full-{{ cattle.cattle.id }}" style="display: none;">{{ cattle.cattle.comments }}</div>
+                <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="show-more" onclick="showFullComments({{ cattle.cattle.id }}); return false;">Show More</a>
+                <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="show-less" onclick="showShortComments({{ cattle.cattle.id }}); return false;" style="display: none;">Show Less</a>
+                    </td>
+    </tr>
+    {% empty %}
+            <tr>
+                <td colspan="3">No cattle in the group.</td>
+            </tr>
+
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% block scripts %}
+  <script>
+    // Function to show the full comments when "Show More" is clicked
+    function showFullComments(cattleId) {
+      const shortComments = document.querySelector(`#comments-short-${cattleId}`);
+      const fullComments = document.querySelector(`#comments-full-${cattleId}`);
+      const showMoreLink = document.querySelector(`a[data-cattle-id="${cattleId}"]`);
+      const showLessLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="show-less"]`);
+
+      // Hide the short comments and show the full comments
+      shortComments.style.display = "none";
+      fullComments.style.display = "";
+
+      // Hide the "Show More" link and show the "Show Less" link
+      showMoreLink.style.display = "none";
+      showLessLink.style.display = "";
+    }
+
+    // Function to show the short comments when "Show Less" is clicked
+    function showShortComments(cattleId) {
+      const shortComments = document.querySelector(`#comments-short-${cattleId}`);
+      const fullComments = document.querySelector(`#comments-full-${cattleId}`);
+      const showMoreLink = document.querySelector(`a[data-cattle-id="${cattleId}"]`);
+      const showLessLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="show-less"]`);
+
+      // Hide the full comments and show the short comments
+      fullComments.style.display = "none";
+      shortComments.style.display = "";
+
+      // Hide the "Show Less" link and show the "Show More" link
+      showLessLink.style.display = "none";
+      showMoreLink.style.display = "";
+    }
+  </script>
+  {% endblock %}
+{% endblock %}

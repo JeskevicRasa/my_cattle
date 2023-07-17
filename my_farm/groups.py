@@ -101,8 +101,6 @@ class GroupNumbers:
                      item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in end_date_list] and
                      item not in self.filter_acquisition_loss_dates]
 
-        print(moved_out)
-
         moved_in = [item for item in end_date_list if
                     item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in start_date_list] and
                     item not in self.filter_acquisition_loss_dates]
@@ -114,13 +112,48 @@ class GroupNumbers:
         self.weight_moved_out = round(sum(item.get('weight', 0) for item in moved_out), 2)
 
 
+class CattleGroupData:
+    def __init__(self, group_name, group_data):
+        self.group_name = group_name
+        self.group_data = group_data
+        self.id = None
+        self.type = None
+        self.number = None
+        self.name = None
+        self.gender = None
+        self.breed = None
+        self.birth_date = None
+        self.acquisition_method = None
+        self.entry_date = None
+        self.comments = None
+        self.active_cattle = 0
+
+    def cattle_data(self):
+        for cattle_data in self.group_data:
+            if cattle_data['cattle']['end_date'] is not None:
+                self.id = cattle_data['cattle']['id']
+                self.type = cattle_data['cattle']['type']
+                self.number = cattle_data['cattle']['number']
+                self.name = cattle_data['cattle']['name']
+                self.gender = cattle_data['cattle']['gender']
+                self.breed = cattle_data['cattle']['breed']
+                self.birth_date = cattle_data['cattle']['birth_date']
+                self.acquisition_method = cattle_data['cattle']['acquisition_method']
+                self.entry_date = cattle_data['cattle']['entry_date']
+                self.comments = cattle_data['cattle']['comments']
+
+    def count_active_cattle(self):
+        print(self.group_data)
+        self.active_cattle = sum(
+            1 for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None)
+
+
 class GroupsManagement:
     def __init__(self):
         self.groups: list[GroupNumbers] = []
 
     def calculate_groups(self, estimation_date):
         cattle_list = list(Cattle.objects.filter(deleted=False).values())
-
         groups = {
             'Cows': [{'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                      for cattle in cattle_list if cattle['gender'] == 'Cow'
@@ -132,32 +165,31 @@ class GroupsManagement:
                 and 0 <= self.calculate_age(cattle['birth_date'], estimation_date) < 12
                 and cattle['entry_date'] <= estimation_date],
 
-            'Young Heifer': [
+            'Young_Heifer': [
                 {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                 for cattle in cattle_list if cattle['gender'] == 'Heifer'
                 and 12 <= self.calculate_age(cattle['birth_date'], estimation_date) < 24
                 and cattle['entry_date'] <= estimation_date],
 
-            'Adult Heifer': [
+            'Adult_Heifer': [
                 {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                 for cattle in cattle_list if cattle['gender'] == 'Heifer'
                 and self.calculate_age(cattle['birth_date'], estimation_date) >= 24
                 and cattle['entry_date'] <= estimation_date],
 
-            'Young Bull': [
+            'Young_Bull': [
                 {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                 for cattle in cattle_list if cattle['gender'] == 'Bull'
                 and 12 <= self.calculate_age(cattle['birth_date'], estimation_date) < 24
                 and cattle['entry_date'] <= estimation_date],
 
-            'Adult Bull': [
+            'Adult_Bull': [
                 {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                 for cattle in cattle_list if cattle['gender'] == 'Bull'
                 and self.calculate_age(cattle['birth_date'], estimation_date) >= 24
                 and cattle['entry_date'] <= estimation_date],
         }
 
-        # print(groups)
         return groups
 
     def add_group(self, group_name, estimation_date):

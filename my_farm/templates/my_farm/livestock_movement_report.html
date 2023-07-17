@@ -2,6 +2,8 @@
 {% block content %}
 
 
+
+
   <div class="report-info">
     <p>Reporting Start Date: {{ start_date }}</p>
     <p>Reporting End Date: {{ end_date }}</p>
@@ -60,8 +62,8 @@
           {% for group in groups %}
             <tr>
               <td>{{ group.group_name }}</td>
-              <td>{% if group.start_date_count == 0 %}{% else %}{{ group.start_date_count }}{% endif %}</td>
-              <td>{% if group.start_date_group_weight == 0 %}{% else %}{{ group.start_date_group_weight }}{% endif %}</td>
+              <td class="beginning-pcs-cell">{% if group.start_date_count == 0 %}{% else %}{{ group.start_date_count }}{% endif %}</td>
+              <td class="beginning-kg-cell">{% if group.start_date_group_weight == 0 %}{% else %}{{ group.start_date_group_weight }}{% endif %}</td>
               <td>{% if group.birth_count == 0 %}{% else %}{{ group.birth_count }}{% endif %}</td>
               <td>{% if group.birth_weight == 0 %}{% else %}{{ group.birth_weight }}{% endif %}</td>
               <td>{% if group.purchase_count == 0 %}{% else %}{{ group.purchase_count }}{% endif %}</td>
@@ -80,8 +82,8 @@
               <td>{% if group.consumed_weight == 0 %}{% else %}{{ group.consumed_weight }}{% endif %}</td>
               <td>{% if group.gifted_count == 0 %}{% else %}{{ group.gifted_count }}{% endif %}</td>
               <td>{% if group.gifted_weight == 0 %}{% else %}{{ group.gifted_weight }}{% endif %}</td>
-              <td>{% if group.end_date_count == 0 %}{% else %}{{ group.end_date_count }}{% endif %}</td>
-              <td>{% if group.end_date_group_weight == 0 %}{% else %}{{ group.end_date_group_weight }}{% endif %}</td>
+              <td class="end-pcs-cell">{% if group.end_date_count == 0 %}{% else %}{{ group.end_date_count }}{% endif %}</td>
+              <td class="end-kg-cell">{% if group.end_date_group_weight == 0 %}{% else %}{{ group.end_date_group_weight }}{% endif %}</td>
               <td>{% if group.count_difference == 0 %}{% else %}{{ group.count_difference }}{% endif %}</td>
               <td>{% if group.weight_difference == 0 %}{% else %}{{ group.weight_difference }}{% endif %}</td>
             </tr>

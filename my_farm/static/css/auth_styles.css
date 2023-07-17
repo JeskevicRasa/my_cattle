@@ -155,9 +155,6 @@ html, body {
 
 /* Login and register page buttons */
 
-.btn-primary btn-block {
-    background-color: #d47e1e;
-}
 
 .btn-block {
     color: white;
@@ -198,16 +195,6 @@ html, body {
 	background-color: #28a745;
 	color: black;
 	border: 0 !important;
-}
-
-
-
-.links {
-	color: white;
-}
-
-.links a {
-	margin-left: 4px;
 }
 
 

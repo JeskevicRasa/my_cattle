@@ -6,7 +6,7 @@
 
 <h3 class="text-uppercase" style="text-align: center; margin: 20px;">All Cattle</h3>
 
-    <form method="POST" action="{% url 'my_farm:add_row' %}">
+    <form method="POST" action="{% url 'my_farm:add_cattle' %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-custom">Add cattle information</button>
     </form>
@@ -48,7 +48,7 @@
     <button type="submit">Apply</button>
 </form>
 
-
+<div class="table-responsive">
 <table id="cattle-table" class="table table-bordered">
   <thead>
     <tr class="column-names">
@@ -56,7 +56,6 @@
       <th class="cattle-number">Number</th>
       <th class="cattle-name">Name</th>
       <th class="cattle-gender">Gender</th>
-      <th class="cattle-age_group">Age Group</th>
       <th class="cattle-breed">Breed</th>
       <th class="cattle-birth_date">Birth date</th>
       <th class="cattle-acquisition_method">Acquisition method</th>
@@ -71,11 +70,10 @@
     <tr>
       <td class="cattle-type">{{ cow.type }}</td>
       <td class="cattle-number">
-        <a href="{% url 'my_farm:one_cattle_info' cow.id %}">{{ cow.number }}</a>
+        <a href="{% url 'my_farm:cattle_detail' cow.id %}">{{ cow.number }}</a>
       </td>
       <td class="cattle-name">{{ cow.name }}</td>
       <td class="cattle-gender">{{ cow.gender }}</td>
-      <td class="cattle-age_group">{{ cow.age_group }}</td>
       <td class="cattle-breed">{{ cow.breed }}</td>
       <td class="cattle-birth_date">{{ cow.birth_date|date:"Y-m-d" }}</td>
       <td class="cattle-acquisition_method">{{ cow.acquisition_method }}</td>
@@ -92,6 +90,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 
     {% if cattle.has_other_pages %}
         <div class="pagination justify-content-center">
@@ -169,4 +168,3 @@
 
 {% endblock %}
 {% endblock %}
-

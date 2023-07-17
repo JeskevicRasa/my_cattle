@@ -9,6 +9,7 @@
       background-color: #e9e9e9;
     }
 
+
     .table-bordered tbody tr:nth-child(even):not(:hover) {
       background-color: #f9f9f9;
     }
@@ -21,13 +22,10 @@
     .table-bordered {
       font-size: 16px;
       padding: 5px;
-      max-width: auto; /* Adjust the max-width as needed */
+      max-width: auto;
+      color: #444444;/* Adjust the max-width as needed */
     }
 
-    /* Custom table styling */
-    .table-bordered {
-      color: #444444;
-    }
 
   .table-bordered th,
   .table-bordered td {
@@ -35,6 +33,18 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .herd-detail {
+  background-color: #eddba6;
+  }
+
+    .field-detail {
+  background-color: #c8dbc3;
+  }
+
+      .cattle-detail {
+  background-color: #ceddde;
   }
 
     .table-bordered thead th {
@@ -51,6 +61,43 @@
         text-decoration: underline; /* Add underline to links */
     }
 
+    .bordered-herd a:hover {
+        color: #b5a369; /* Change link color on hover */
+    }
+
+
     .table-bordered a:hover {
         color: #2a5298; /* Change link color on hover */
     }
+
+
+  .table-bordered thead tr.column-names-herds th {
+    background-color: #eddba6;
+    border-bottom-color: #b8b8b8;
+  }
+
+    .table-bordered thead tr.column-names-groups th {
+    background-color: #ceddde;
+    border-bottom-color: #b8b8b8;
+  }
+
+    .table-bordered thead tr.column-names-fields th {
+    background-color: #bbd1b6;
+    border-bottom-color: #b8b8b8;
+  }
+
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+.beginning-pcs-cell,
+.beginning-kg-cell {
+  background-color:#f2d6cb;
+}
+
+.end-pcs-cell,
+.end-kg-cell {
+  background-color: #dce3f5;
+}

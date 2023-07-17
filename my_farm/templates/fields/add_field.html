@@ -1,0 +1,58 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+    <title>New Field</title>
+
+    <h3 class="text-uppercase" style="text-align: center; margin: 20px;">Add Field</h3>
+    <div class="card-field">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}" class="label-field">Name:</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}" class="label-field">Location:</label>
+                {{ form.location }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.coordinates.id_for_label }}" class="label-field">Coordinates:</label>
+                {{ form.coordinates }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.field_size.id_for_label }}" class="label-field">Field Size:</label>
+                {{ form.field_size }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.size_unit.id_for_label }}" class="label-field">Size Unit:</label>
+                {{ form.size_unit }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.field_type.id_for_label }}" class="label-field">Field Type:</label>
+                {{ form.field_type }}
+            </div>
+            <div class="form-group form-check">
+                <input class="form-check-input" type="checkbox" id="{{ form.is_active.id_for_label }}"
+                       name="{{ form.is_active.name }}" {% if form.is_active.value %}checked{% endif %}>
+                <label class="form-check-label label-field" for="{{ form.is_active.id_for_label }}">Is Active</label>
+            </div>
+            <div class="form-group">
+    <label for="{{ form.herd.id_for_label }}" class="label-field">Herds:</label>
+    <select class="form-control select2-multiple" id="{{ form.herd.id_for_label }}" name="{{ form.herd.name }}" multiple>
+        {% for herd in herd_queryset %}
+            <option value="{{ herd.pk }}">{{ herd }}</option>
+        {% endfor %}
+    </select>
+</div>
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="label-field">Description:</label>
+                {{ form.description }}
+            </div>
+      <div class="form-group">
+        <label for="{{ form.picture.id_for_label }}" class="label-cattle">Picture:</label>
+        {{ form.picture }}
+      </div>
+            <button type="submit" class="btn btn-custom" style="background-color:#6d8c66;">Add New Field</button>
+        </form>
+    </div>
+{% endblock %}

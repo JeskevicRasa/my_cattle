@@ -15,11 +15,12 @@
 <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/colors.min.css">
-<link rel="stylesheet" href="{% static 'css/table_styles.css' %}">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
+<link rel="stylesheet" href="{% static 'css/my_farm_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/table_styles.css' %}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 
     <!-- Messages -->
@@ -43,26 +44,41 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
+
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_farm:field_list' %}">Fields</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'my_farm:herd_list' %}">Herds</a>
+                </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCattle" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        My farm
+                        Cattle
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'my_farm:add_row' %}">Add Cattle</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownCattle">
+                        <a class="dropdown-item" href="{% url 'my_farm:add_cattle' %}">Add Cattle</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'my_farm:cattle_info' %}">Cattle Management</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'my_farm:generate_report' %}">Movement report</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'profile' %}">Account</a>
                     </div>
                 </li>
-                                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user"></i> <!-- User icon -->
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownUser">
+                        <a class="dropdown-item" href="{% url 'profile' %}">Account</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -95,64 +111,84 @@
         }
     </script>
 
+  <!-- Add Bootstrap CSS link here -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-pzjw8f+ua5v5l8W5+ST+ZttrvjfKrO56+dCvz4cLIFhP9S8cV+5U2tflRqsr/N4"
+    crossorigin="anonymous">
+    <!-- Add Bootstrap JS script here -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-pzjw8f+ua5v5l8W5+ST+ZttrvjfKrO56+dCvz4cLIFhP9S8cV+5U2tflRqsr/N4"
+    crossorigin="anonymous"></script>
+
+<!-- Add Select2 CSS link here -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+
+<!-- Add Select2 JS script here -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.select2-multiple').select2({
+      placeholder: 'Select options',
+      allowClear: true
+    });
+  });
+</script>
+
+
+
+  <script>
+     // Function to show the full comments when "Show More" is clicked
+    function showFullComments(cowId) {
+        const shortComments = document.querySelector(`#comments-short-${cowId}`);
+        const fullComments = document.querySelector(`#comments-full-${cowId}`);
+        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
+        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
+
+        // Hide the short comments and show the full comments
+        shortComments.style.display = "none";
+        fullComments.style.display = "";
+
+        // Hide the "Show More" link and show the "Show Less" link
+        showMoreLink.style.display = "none";
+        showLessLink.style.display = "";
+    }
+
+    // Function to show the short comments when "Show Less" is clicked
+    function showShortComments(cowId) {
+        const shortComments = document.querySelector(`#comments-short-${cowId}`);
+        const fullComments = document.querySelector(`#comments-full-${cowId}`);
+        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
+        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
+
+        // Hide the full comments and show the short comments
+        fullComments.style.display = "none";
+        shortComments.style.display = "";
+
+        // Hide the "Show Less" link and show the "Show More" link
+        showLessLink.style.display = "none";
+        showMoreLink.style.display = "";
+    }
+
+
+    const form = document.querySelector('#column-form');
+    const table = document.querySelector('#cattle-table');
+    const columns = Array.from(document.querySelectorAll('[name="columns"]'));
+
+    // Show/hide columns based on user selection
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      columns.forEach((column) => {
+        const columnName = column.value;
+        const columnCells = Array.from(table.querySelectorAll(`.cattle-${columnName}`));
+        columnCells.forEach((cell) => {
+          cell.style.display = column.checked ? '' : 'none';
+        });
+      });
+    });
+  </script>
 
 </body>
 </html>
-
-<style>
-  .navbar {
-    height: 70px;
-    background-color: #E7EFE1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .navbar-nav .nav-link {
-    color: #009C9F; /* Set the default color of navbar links to #009C9F */
-  }
-
-  .navbar-nav .nav-link.my-cattle-link,
-  .navbar-nav .nav-link.my-cattle-link:hover {
-    color: #009C9F !important; /* Set the color of the "My Cattle" link to #009C9F */
-  }
-
-  .navbar-nav .nav-link:hover {
-    color: #005E63; /* Set the hover color of navbar links to #005E63 */
-  }
-
-  body {
-    background-color: #F5F7FA;
-  }
-
-    h3, h4, span, a {
-    font-weight: normal !important;
-    color: #444444;
-    font-family: 'Montserrat', sans-serif;
-  }
-
-  .btn-custom {
-    color: white;
-    background-color: #009C9F;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .btn-custom:hover {
-    background-color: #008288;
-    color: #444444;
-  }
-
-  .dropdown-divider {
-    border-top: 1px solid #ccc;
-    margin: 4px 0;
-    }
-
-  .dropdown-item:hover {
-    background-color: #444444;
-    color: #ffffff;
-    }
-</style>
-
 
 

@@ -1,13 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'base_user.html' %}
 
 {% block content %}
-     <h2>Upload Picture</h2>
+<div class="card" style="max-width: 400px; margin: 20px auto; padding: 20px;">
+    <h3 style="text-align: left; margin-top: 20px;">Upload Picture</h3>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <label class="btn btn-primary btn-file">
-            Choose File <input type="file" name="picture" accept="image/*" style="display: none;">
+        <label class="btn btn-danger">
+            <input type="file" name="picture" accept="image/*" style="display: none;">
+            Choose File
         </label>
         <div style="height: 20px;"></div>
-        <button class="btn btn-primary" type="submit">Upload</button>
+        <button class="btn btn-custom" type="submit">Upload</button>
     </form>
+</div>
 {% endblock %}
+
+
+
+
+
+
+

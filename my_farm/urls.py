@@ -1,20 +1,47 @@
+
 from django.urls import path
-# from .livestock_movement_report import LivestockMovementReportView
-from .views import home, cattle_info, add_row, confirmation_page, update_cattle, search_cattle, \
-    GenerateReportView, LivestockMovementReportView, CattleDeleteView, one_cattle_info, upload_picture
+from .views import home, group_data
+from .views_herd import herd_list, add_herd, herd_detail, cattle_list_by_herd, search_herd, update_herd, \
+    upload_herd_picture
+from .views_movement_report import GenerateReportView, LivestockMovementReportView
+from .views_field import field_list, field_detail, herd_list_by_field, update_field, add_field, upload_field_picture
+from .views_cattle import cattle_info, add_cattle, update_cattle, search_cattle, cattle_detail, \
+    delete_confirmation_page, CattleDeleteView, upload_cattle_picture
 
 app_name = "my_farm"
 
 urlpatterns = [
+
     path('', home, name='home'),
-    path('cattle_info/', cattle_info, name='cattle_info'),
-    path('one_cattle_info/<int:cattle_id>/', one_cattle_info, name='one_cattle_info'),
-    path('upload_picture/<int:cattle_id>/', upload_picture, name='upload_picture'),
-    path('add_row/', add_row, name='add_row'),
-    path('update_cattle/<int:cattle_id>/', update_cattle, name='update_cattle'),
-    path('cattle/delete/<int:pk>/', CattleDeleteView.as_view(), name='delete_cattle'),
-    path('search_cattle/', search_cattle, name='search_cattle'),
-    path('confirmation_page/', confirmation_page, name='confirmation_page'),
+    path('group_data/<slug:group_name>/', group_data, name='group_data'),
+
     path('generate_report/', GenerateReportView.as_view(), name='generate_report'),
     path('livestock_movement_report/', LivestockMovementReportView.as_view(), name='report'),
+
+    path('cattle_info/', cattle_info, name='cattle_info'),
+    path('cattle/<int:cattle_id>/', cattle_detail, name='cattle_detail'),
+    path('add_cattle/', add_cattle, name='add_cattle'),
+    path('update_cattle/<int:cattle_id>/', update_cattle, name='update_cattle'),
+    path('upload_cattle_picture/<int:cattle_id>/', upload_cattle_picture, name='upload_cattle_picture'),
+    path('cattle/delete/<int:pk>/', CattleDeleteView.as_view(), name='delete_cattle'),
+    path('confirmation_page/', delete_confirmation_page, name='delete_confirmation_page'),
+    path('search_cattle/', search_cattle, name='search_cattle'),
+
+    path('herds/', herd_list, name='herd_list'),
+    path('herds/<int:herd_id>/', herd_detail, name='herd_detail'),
+    path('herds/new_herd', add_herd, name='add_herd'),
+    path('herd/<int:herd_id>/cattle/', cattle_list_by_herd, name='cattle_list_by_herd'),
+    path('herd/update_herd/<int:herd_id>/', update_herd, name='update_herd'),
+    path('herd/upload_herd_picture/<int:herd_id>/', upload_herd_picture, name='upload_herd_picture'),
+    path('search_herd/', search_herd, name='search_herd'),
+
+    path('fields/', field_list, name='field_list'),
+    path('fields/<int:field_id>/', field_detail, name='field_detail'),
+    path('fields/new_field', add_field, name='add_field'),
+    path('fields/<int:field_id>/herd/', herd_list_by_field, name='herd_list_by_field'),
+    path('fields/update_field/<int:field_id>/', update_field, name='update_field'),
+    path('fields/upload_field_picture/<int:field_id>/', upload_field_picture, name='upload_field_picture'),
+
+
+
 ]

@@ -1,0 +1,98 @@
+.navbar {
+  height: 70px;
+  background-color: #E7EFE1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .nav-link {
+  color: #009C9F;
+  font-size: 18px;
+  padding: 8px 16px;
+}
+
+.navbar-nav .nav-link.my-cattle-link,
+.navbar-nav .nav-link.my-cattle-link:hover {
+  color: #009C9F !important;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #005E63;
+}
+
+body {
+  background-color: #F5F7FA;
+}
+
+h3, h4, span, a {
+  font-weight: normal !important;
+  color: #444444;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.btn-custom {
+  color: white;
+  background-color: #009C9F;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-custom:hover {
+  background-color: #008288;
+  color: #444444;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #ccc;
+  margin: 4px 0;
+}
+
+.dropdown-menu {
+   background-color: #444444;
+   }
+
+.dropdown-item {
+  color: #ffffff;
+  background-color: #444444;
+}
+
+.dropdown-item:hover {
+  background-color: #ffffff;
+  color:  #005E63;
+}
+
+.label-cattle {
+  font-weight: bold;
+  color: #044e52; /* Very dark blue color */
+}
+
+.label-field {
+  font-weight: bold;
+  color: #006400;
+}
+
+.label-herd {
+  font-weight: bold;
+  color: #634d0a;
+}
+
+    .card-report {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-container-report {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .date-inputs-report {
+      display: flex;
+      gap: 20px;
+    }

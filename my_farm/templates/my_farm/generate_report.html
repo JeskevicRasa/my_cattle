@@ -3,37 +3,16 @@
 {% block content %}
 <head>
   <title>Generate Report</title>
-  <style>
-    .card {
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .report-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .date-inputs {
-      display: flex;
-      gap: 20px;
-    }
-  </style>
 </head>
 
 <body>
   <h3 class="text-uppercase" style="text-align: center; margin: 30px;">Generate report</h3>
 
-  <div class="card">
-    <div class="report-container">
+  <div class="card-report">
+    <div class="report-container-report">
       <form method="post" action="{% url 'my_farm:generate_report' %}">
         {% csrf_token %}
-        <div class="date-inputs">
+        <div class="date-inputs-report">
           <div class="form-group">
             <label for="start_date">Start Date:</label>
             <input type="date" id="start_date" name="start_date" required>

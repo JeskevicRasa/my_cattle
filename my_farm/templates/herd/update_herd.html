@@ -1,0 +1,59 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+    <title>Update Herd Information</title>
+
+    <h3 class="text-uppercase" style="text-align: center; margin: 20px;">Update "{{ herd.name }}" Herd</h3>
+    <div class="card-herds">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}" class="label-herd">Name:</label>
+                {{ form.name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}" class="label-herd">Location:</label>
+                {{ form.location }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.field.id_for_label }}" class="label-herd">Field:</label>
+                {{ form.field }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.cattle.id_for_label }}" class="label-herd">Cattle:</label>
+                <select class="form-control select2-multiple" id="{{ form.cattle.id_for_label }}"
+                        name="{{ form.cattle.name }}" multiple>
+                    {% for option in form.fields.cattle.queryset %}
+                        <option value="{{ option.pk }}" {% if option in form.cattle.value %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}" class="label-herd">Description:</label>
+                {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.start_date.id_for_label }}" class="label-herd">Start Date:</label>
+                {{ form.start_date }}
+            </div>
+            <div class="form-group form-check">
+                <input class="form-check-input" type="checkbox" id="{{ form.is_active.id_for_label }}"
+                       name="{{ form.is_active.name }}" {% if form.is_active.value %}checked{% endif %}>
+                <label class="form-check-label label-herd" for="{{ form.is_active.id_for_label }}">Is Active</label>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.herd_leader.id_for_label }}" class="label-herd">Herd Leader:</label>
+                <select class="form-control" id="{{ form.herd_leader.id_for_label }}" name="{{ form.herd_leader.name }}">
+                    {% for option in form.fields.herd_leader.queryset %}
+                        <option value="{{ option.pk }}" {% if option == form.herd_leader.value %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="{{ form.picture.id_for_label }}" class="label-herd">Picture:</label>
+                {{ form.picture }}
+            </div>
+            <button type="submit" class="btn btn-custom" style="background-color: #b5a369;">Update herd information</button>
+        </form>
+    </div>
+{% endblock %}

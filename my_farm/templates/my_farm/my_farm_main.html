@@ -11,6 +11,7 @@
         <div style="height: 20px;"></div>
       </div>
     </div>
+
     <div class="row">
       <div class="col-xl-3 col-sm-6 col-12">
         <a href="{% url 'my_farm:cattle_info' %}">
@@ -22,7 +23,7 @@
                     <img src="{% static 'img/cattle.png' %}" width="60" height="60" alt="Cattle Icon">
                   </div>
                   <div class="media-body text-center">
-                    <h3>{{ total_cattle }}</h3>
+                    <h3>{{ total_cattle_count }}</h3>
                     <span>Number of Cattle</span>
                   </div>
                 </div>
@@ -32,28 +33,32 @@
         </a>
       </div>
 
-        <div class="col-xl-3 col-sm-6 col-12">
-  <a href="{% url 'my_farm:search_cattle' %}?query=Cows">
-    <div class="card mb-3">
-      <div class="card-content">
-        <div class="card-body">
-          <div class="media d-flex">
-            <div class="align-self-center">
-              <img src="{% static 'img/cow3.png' %}" width="60" height="60" alt="Cow Icon">
-            </div>
-            <div class="media-body text-center">
-              <h3>{{ total_cows }}</h3>
-              <span>Cows</span>
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:group_data' group_name='Cows' %}">
+          <div class="card mb-3">
+            <div class="card-content">
+              <div class="card-body">
+                <div class="media d-flex">
+                  <div class="align-self-center">
+                    <img src="{% static 'img/cow3.png' %}" width="60" height="60" alt="Cow Icon">
+                  </div>
+                  <div class="media-body text-center">
+                      {% for group in groups %}
+                        {% if group.group_name == 'Cows' %}
+                          <h3>{{ group.active_cattle }}</h3>
+                          <span>Cows</span>
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </a>
       </div>
-    </div>
-  </a>
-</div>
 
-        <div class="col-xl-3 col-sm-6 col-12">
-           <a href="{% url 'my_farm:search_cattle' %}?query=Calves">
+      <div class="col-xl-3 col-sm-6 col-12">
+         <a href="{% url 'my_farm:group_data' group_name='Calves' %}">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
@@ -62,71 +67,83 @@
                     <img src="{% static 'img/calve1.png' %}" width="60" height="60" alt="Calve Icon">
                   </div>
                   <div class="media-body text-center">
-                    <h3>{{ total_calves }}</h3>
-                    <span>Calves</span>
+                      {% for group in groups %}
+                        {% if group.group_name == 'Calves' %}
+                          <h3>{{ group.active_cattle }}</h3>
+                          <span>Calves</span>
+                        {% endif %}
+                      {% endfor %}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-           </a>
-        </div>
-
-        <div class="col-xl-3 col-sm-6 col-12">
-          <div class="card mb-3" style="margin-top: 5px; margin-bottom: 10px;">
-            <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-block">All cattle</a>
-          </div>
-          <div class="card">
-            <a href="{% url 'my_farm:generate_report' %}" class="btn btn-block">Report</a>
-          </div>
-        </div>
+        </a>
       </div>
 
-      <div class="row">
-        <div class="col-xl-3 col-sm-6 col-12">
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:group_data' group_name='Young_Heifer' %}">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
-                  <div class="media-body text-left">
-                    <h3 class="danger" style="color: #EE7B96;">{{ total_young_heifer }}</h3>
-                    <span>Young Heifers</span><br>
-                  </div>
                   <div class="align-self-center">
                     <img src="{% static 'img/youngcow.png' %}" width="60" height="60" alt="Young Heifer Icon">
                   </div>
+                  <div class="media-body text-center">
+                    {% for group in groups %}
+                        {% if group.group_name == 'Young_Heifer' %}
+                    <h3 style="color: #EE7B96;">{{ group.active_cattle }}</h3>
+                    <span>Young Heifers</span>
+                    {% endif %}
+                      {% endfor %}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </a>
+      </div>
+    </div>
 
-        <div class="col-xl-3 col-sm-6 col-12">
+    <div class="row">
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:group_data' group_name='adult_heifer' %}">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="success">{{ total_adult_heifer }}</h3>
+                    {% for group in groups %}
+                        {% if group.group_name == 'Adult_Heifer' %}
+                    <h3>{{ group.active_cattle }}</h3>
                     <span>Adult Heifers</span>
+                    {% endif %}
+                      {% endfor %}
                   </div>
                   <div class="align-self-center">
-                    <img src="{% static 'img/cowcow.png' %}" width="60" height="60" alt="Adult Heifer Icon">
+                    <img src="{% static 'img/cowcow.png' %}" width="60" height="60">
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </a>
+      </div>
 
-        <div class="col-xl-3 col-sm-6 col-12">
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:group_data' group_name='young_bull' %}">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="warning">{{ total_young_bull }}</h3>
+                    {% for group in groups %}
+                        {% if group.group_name == 'Young_Bull' %}
+                    <h3>{{ group.active_cattle }}</h3>
                     <span>Young Bulls</span>
+                    {% endif %}
+                      {% endfor %}
                   </div>
                   <div class="align-self-center">
                     <img src="{% static 'img/youngbull.png' %}" width="60" height="60" alt="Young Bull Icon">
@@ -135,16 +152,22 @@
               </div>
             </div>
           </div>
-        </div>
+        </a>
+      </div>
 
-        <div class="col-xl-3 col-sm-6 col-12">
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:group_data' group_name='Adult_Bull' %}">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="primary">{{ total_adult_bull }}</h3>
+                    {% for group in groups %}
+                        {% if group.group_name == 'Adult_Bull' %}
+                    <h3>{{ group.active_cattle }}</h3>
                     <span>Adult Bulls</span>
+                    {% endif %}
+                      {% endfor %}
                   </div>
                   <div class="align-self-center">
                     <img src="{% static 'img/adultbull.png' %}" width="60" height="60" alt="Adult Bull Icon">
@@ -153,10 +176,72 @@
               </div>
             </div>
           </div>
+        </a>
+      </div>
+
+      <div class="col-xl-3 col-sm-6 col-12">
+        <a href="{% url 'my_farm:herd_list' %}">
+          <div class="card mb-3" style="background-color: #fcecc0;">
+            <div class="card-content">
+              <div class="card-body">
+                <div class="media d-flex">
+                  <div class="media-body text-left">
+                    <h3 class="primary">{{ active_herds_count }}</h3>
+                    <span>Active Herds</span>
+                  </div>
+                  <div class="align-self-center">
+                    <img src="{% static 'img/herd.png' %}" width="60" height="60" alt="Active Herds Icon">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+<div class="row" style="display: flex;">
+  <div class="col-xl-9 col-sm-6 col-12">
+    <div class="card mb-3" style="flex: 1; height: 80%;">
+      <div class="card-content">
+        <div class="card-body">
+          <div class="media d-flex">
+<div class="text-center">
+  <a href="{% url 'my_farm:generate_report' %}" class="d-inline-block" style="font-size: 20px;">
+    Livestock movement report
+  </a>
+</div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   </div>
 
+  <div class="col-xl-3 col-sm-6 col-12">
+    <a href="{% url 'my_farm:field_list' %}">
+      <div class="card mb-3" style="background-color: #e1f2e6; height: 80%;">
+        <div class="card-content">
+          <div class="card-body">
+            <div class="media d-flex">
+             <div class="align-self-center">
+                <img src="{% static 'img/fields.png' %}" width="60" height="60">
+              </div>
+              <div class="media-body text-center">
+                <h3 class="primary">{{ active_field_count }}</h3>
+                <span>Active Fields</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+
+
+
+  </section>
+</div>
 
 {% endblock %}

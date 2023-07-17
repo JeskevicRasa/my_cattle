@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_auth.html" %}
 {% block content %}
 {% load static %}
 
@@ -11,7 +11,7 @@
 
       <br><br>
       <h1>This is my cattle</h1>
-      <p>Information about this tool</p>
+      <p>Welcome to cattle management tool</p>
       {% if user.is_authenticated %}
         <a href="{% url 'my_farm:home' %}" class="btn btn-success btn-lg">Your farm</a>
         <a href="{% url 'my_farm:cattle_info' %}" class="btn btn-success btn-lg">Cattle Information</a>
@@ -58,11 +58,6 @@
               </div>
               <button type="submit" class="btn btn-success login-button">Login</button>
             </form>
-          </div>
-          <div class="card-footer">
-            <div class="d-flex justify-content-center links">
-              Forgot password?<a href="{% url 'password_reset' %}">Reset here</a>
-            </div>
           </div>
         </div>
       </div>

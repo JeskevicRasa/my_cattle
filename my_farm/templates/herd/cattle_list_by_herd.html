@@ -1,0 +1,49 @@
+{% extends 'base_user.html' %}
+{% block content %}
+
+<title>Cattle in the Herd</title>
+
+
+<h3 class="text-uppercase" style="text-align: center; margin: 30px;">
+    Cattle in - <a style="color:blue;" href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a> - herd
+</h3>
+
+<table class="table table-bordered">
+  <thead>
+    <tr class="column-names-herds">
+      <th>Number</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Entry Date</th>
+      <th>Breed</th>
+      <th>Loss method</th>
+      <th>Comments</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cattle in cattle_list %}
+    <tr>
+      <td>
+        <a href="{% url 'my_farm:cattle_detail' cattle.id %}">{{ cattle.number }}</a>
+      </td>
+      <td>{{ cattle.name }}</td>
+      <td>{{ cattle.gender }}</td>
+      <td>{{ cattle.entry_date|date:"Y-m-d" }}</td>
+      <td>{{ cattle.breed }}</td>
+      <td>{{ cattle.loss_method }}</td>
+      <td>
+        <div id="comments-short-{{ cattle.id }}">{{ cattle.comments|truncatechars:20 }}</div>
+        <div id="comments-full-{{ cattle.id }}" style="display: none;">{{ cattle.comments }}</div>
+        <a href="#" data-cattle-id="{{ cattle.id }}" data-action="show-more" onclick="showFullComments({{ cattle.id }}); return false;">Show More</a>
+        <a href="#" data-cattle-id="{{ cattle.id }}" data-action="show-less" onclick="showShortComments({{ cattle.id }}); return false;" style="display: none;">Show Less</a>
+      </td>
+    </tr>
+    {% empty %}
+            <tr>
+                <td colspan="3">No cattle in the herd.</td>
+            </tr>
+            {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

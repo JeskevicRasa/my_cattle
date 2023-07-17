@@ -1,0 +1,73 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+
+<title>Herd Detail</title>
+
+{% if herd %}
+<h4 style="text-align: center; margin: 20px; font-weight: bold;">Herd "{{ herd.name }}"</h4>
+
+<table class="table table-bordered" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+    <tr>
+        <th class="herd-detail">Picture</th>
+        <td style="width: 300px; height: 200px; max-width: 100%; max-height: 100%;">
+            {% if herd.picture %}
+            <img src="{{ herd.picture.url }}" style="max-width: 100%; max-height: 100%;">
+            {% else %}
+            No picture available.
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Name</th>
+        <td>{{ herd.name }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Location</th>
+        <td>{{ herd.location }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Field</th>
+         <td>
+                    {% if herd.field %}
+                        <a href="{% url 'my_farm:field_detail' herd.field.id %}">{{ herd.field }}</a>
+                    {% else %}
+                        No field.
+                    {% endif %}
+                </td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Description</th>
+        <td>{{ herd.description }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Start Date</th>
+        <td>{{ herd.start_date|date:"Y-m-d" }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Active</th>
+        <td>{{ herd.is_active }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Herd Leader</th>
+        <td>{{ herd.herd_leader }}</td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Cattle</th>
+        <td>
+            <a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">{{ herd.cattle_count }}</a>
+        </td>
+    </tr>
+    <tr>
+        <th class="herd-detail">Update</th>
+        <td>
+            <!-- Update link -->
+            <a href="{% url 'my_farm:update_herd' herd.id %}">Update</a>
+        </td>
+    </tr>
+</table>
+
+{% else %}
+<p>No cattle selected.</p>
+{% endif %}
+{% endblock %}

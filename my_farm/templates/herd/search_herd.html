@@ -1,0 +1,62 @@
+{% extends 'base_user.html' %}
+{% block content %}
+
+<title>Search Herd</title>
+
+<body>
+
+<p></p>
+
+<form method="GET" action="{% url 'my_farm:search_herd' %}">
+    <input type="text" name="query" value="{{ query }}" placeholder="Search Cattle">
+    <button type="submit">Search</button>
+</form>
+
+
+    <h3 style="text-align: center; margin: 20px; color: #b5a369;">"{{ query }}" Search Result</h3>
+
+
+
+    <div class="table-responsive">
+        <div class="table-container">
+<table id="herd-table" class="table table-bordered">
+  <thead>
+    <tr class="column-names-herds">
+              <th class="cattle-name">Name</th>
+              <th class="cattle-gender">Location</th>
+              <th class="cattle-breed">Field</th>
+              <th class="cattle-birth_date">Description</th>
+              <th class="cattle-acquisition_method">Start Date</th>
+              <th class="cattle-entry_date">Active</th>
+              <th class="cattle-loss_method">Herd Leader</th>
+              <th class="cattle-end_date">Number of Cattle</th>
+            </tr>
+          </thead>
+        <tbody>
+            {% for herd in herd_list %}
+            <tr>
+                      <td>
+        <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
+      </td>
+                <td>{{ herd.location }}</td>
+                <td>{{ herd.field }}</td>
+                <td>{{ herd.description }}</td>
+                <td>{{ herd.start_date|date:"Y-m-d" }}</td>
+                <td>{{ herd.is_active }}</td>
+                <td>{{ herd.herd_leader }}</td>
+                <td>{{ herd.num_cattle }}
+        <small><a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">View Cattle</a></small>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No herd found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        </div>
+    </div>
+</body>
+
+{% endblock %}

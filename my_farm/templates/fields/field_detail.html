@@ -1,0 +1,69 @@
+{% extends 'base_user.html' %}
+{% block content %}
+
+<title>Field Detail</title>
+
+
+    {% if field %}
+        <h4 style="text-align: center; margin: 20px; font-weight: bold;">Field "{{ field.name }}"</h4>
+
+        <table class="table table-bordered" style="max-width: 500px; margin-left: auto; margin-right: auto;">
+                        <tr>
+                <th class="field-detail">Picture</th>
+                <td style="width: 300px; height: 200px; max-width: 100%; max-height: 100%;">
+                    {% if field.picture %}
+                        <img src="{{ field.picture.url }}" style="max-width: 100%; max-height: 100%;">
+                    {% else %}
+                        No picture available.
+                    {% endif %}
+                    <a href="{% url 'my_farm:upload_field_picture' field_id=field.id %}">Upload Picture</a>
+                </td>
+            </tr>
+            <tr>
+                <th class="field-detail">Name</th>
+                <td>{{ field.name }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Location</th>
+                <td>{{ field.location }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Coordinates</th>
+                <td>{{ field.coordinates }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Field Size</th>
+                <td>{{ field.field_size }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Size Unit</th>
+                <td>{{ field.size_unit }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Field Type</th>
+                <td>{{ field.field_type }}</td>
+            </tr>
+            <tr>
+                <th class="field-detail">Is Active</th>
+                <td>{{ field.is_active }}</td>
+            </tr>
+            <tr>
+<tr>
+    <th class="field-detail">Herds</th>
+    <td>
+        <a href="{% url 'my_farm:herd_list_by_field' field.id %}">{{ field.herd_count }}</a>
+    </td>
+</tr>
+            <tr>
+                 <th class="field-detail">Update</th>
+                 <td>
+                 <!-- Update link -->
+                 <a href="{% url 'my_farm:update_field' field.id %}">Update</a>
+                 </td>
+            </tr>
+        </table>
+
+    {% else %}
+        <p>No cattle selected.</p>
+    {% endif %}
+{% endblock %}

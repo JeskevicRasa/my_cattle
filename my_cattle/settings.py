@@ -139,13 +139,10 @@ DEFAULT_CHARSET = 'utf-8'
 # Set the character encoding used for reading and writing files
 FILE_CHARSET = 'utf-8'
 
-
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/my_farm/'
 LOGOUT_REDIRECT_URL = '/'
 
-
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

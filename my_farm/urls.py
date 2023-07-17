@@ -1,12 +1,13 @@
 
 from django.urls import path
-from .views import home, group_data
+from .views import home, group_data, upload_picture, generate_pdf
 from .views_herd import herd_list, add_herd, herd_detail, cattle_list_by_herd, search_herd, update_herd, \
     upload_herd_picture
 from .views_movement_report import GenerateReportView, LivestockMovementReportView
 from .views_field import field_list, field_detail, herd_list_by_field, update_field, add_field, upload_field_picture
 from .views_cattle import cattle_info, add_cattle, update_cattle, search_cattle, cattle_detail, \
     delete_confirmation_page, CattleDeleteView, upload_cattle_picture
+
 
 app_name = "my_farm"
 
@@ -17,6 +18,8 @@ urlpatterns = [
 
     path('generate_report/', GenerateReportView.as_view(), name='generate_report'),
     path('livestock_movement_report/', LivestockMovementReportView.as_view(), name='report'),
+    path('livestock_movement_report/last_reports/', LivestockMovementReportView.as_view(), {'last_reports': True},
+         name='last_reports'),
 
     path('cattle_info/', cattle_info, name='cattle_info'),
     path('cattle/<int:cattle_id>/', cattle_detail, name='cattle_detail'),
@@ -41,7 +44,6 @@ urlpatterns = [
     path('fields/<int:field_id>/herd/', herd_list_by_field, name='herd_list_by_field'),
     path('fields/update_field/<int:field_id>/', update_field, name='update_field'),
     path('fields/upload_field_picture/<int:field_id>/', upload_field_picture, name='upload_field_picture'),
-
 
 
 ]

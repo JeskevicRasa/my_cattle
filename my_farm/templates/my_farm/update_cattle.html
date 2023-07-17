@@ -1,0 +1,69 @@
+
+{% extends 'base_user.html' %}
+{% block content %}
+{% load static %}
+<head>
+  <title>Update Cattle Information</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{% static 'css/form_styles.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body>
+  <h3 style="text-align: center; margin: 20px;">Update {{ cattle.name }} information</h3>
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.number.id_for_label }}">Number:</label>
+        {{ form.number }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {{ form.name }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.gender.id_for_label }}">Gender:</label>
+        {{ form.gender }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.breed.id_for_label }}">Breed:</label>
+        {{ form.breed }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.birth_date.id_for_label }}">Birth Date:</label>
+        {{ form.birth_date }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.acquisition_method.id_for_label }}">Acquisition Method:</label>
+        {{ form.acquisition_method }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.entry_date.id_for_label }}">Entry Date:</label>
+        {{ form.entry_date }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.loss_method.id_for_label }}">Loss Method:</label>
+        {{ form.loss_method }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.end_date.id_for_label }}">End Date:</label>
+        {{ form.end_date }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.comments.id_for_label }}">Comments:</label>
+        {{ form.comments }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.picture.id_for_label }}">Picture:</label>
+        {{ form.picture }}
+      </div>
+      <button type="submit" class="btn btn-custom">Save</button>
+    </form>
+  </div>
+  <script>
+    flatpickr("#id_birth_date, #id_entry_date, #id_end_date", {
+      dateFormat: "Y-m-d",
+    });
+  </script>
+</body>
+{% endblock %}

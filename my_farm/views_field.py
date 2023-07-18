@@ -64,6 +64,7 @@ def update_field(request, field_id):
 
     return render(request, 'fields/update_field.html', {'form': form, 'field': field, 'herd_queryset': herd_queryset})
 
+
 def field_detail(request, field_id=None):
     field = get_object_or_404(Field, id=field_id) if field_id else None
 

@@ -161,3 +161,4 @@ class CattleDeleteView(DeleteView):
 
 def delete_confirmation_page(request):
     return render(request, 'cattle/confirmation_page.html')
+

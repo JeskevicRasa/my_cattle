@@ -1,17 +1,12 @@
-from dateutil.relativedelta import relativedelta
 from datetime import date
-from django.core.paginator import Paginator
-from django.db.models import Q
-from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import DeleteView
-from my_cattle.forms import GenderForm, CattleForm
-from .models import Cattle
-from django.views import View
-from django.urls import reverse, reverse_lazy
-from .groups import GroupsManagement, GroupNumbers
-from datetime import datetime
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Herd, Field
+from django.urls import reverse
+from .groups import GroupsManagement, GroupNumbers, CattleGroupData
+import json
+from django.utils import timezone
+from django.utils.text import slugify
 
 
 @login_required
@@ -67,8 +62,6 @@ def group_data(request, group_name):
     }
     return render(request, 'my_farm/search_cattle.html', context)
 
-
-
 class GroupNumbersEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, GroupNumbers):
@@ -85,42 +78,3 @@ class DateEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def generate_pdf(request):
-    # Set up Selenium webdriver with Chrome options
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # Run Chrome in headless mode
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-
-    # Initialize the Chrome webdriver
-    driver = webdriver.Chrome(options=options)
-
-    # Load the web page
-    driver.get('http://127.0.0.1:8000/my_farm/livestock_movement_report/')
-
-    # Wait for the report to load
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.container')))
-
-    # Take a screenshot of the web page
-    screenshot = driver.get_screenshot_as_png()
-
-    # Close the Selenium webdriver
-    driver.quit()
-
-    # Create an empty PDF file
-    pdf_file = io.BytesIO()
-
-    # Convert the screenshot image to PDF
-    from PIL import Image
-    img = Image.open(io.BytesIO(screenshot))
-    img.save(pdf_file, 'PDF')
-
-    # Set the PDF file content type and headers
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-
-    # Write the PDF file content to the response
-    response.write(pdf_file.getvalue())
-
-    return response

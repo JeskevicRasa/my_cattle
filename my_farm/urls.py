@@ -1,6 +1,6 @@
 
 from django.urls import path
-from .views import home, group_data, upload_picture, generate_pdf
+from .views import home, group_data
 from .views_herd import herd_list, add_herd, herd_detail, cattle_list_by_herd, search_herd, update_herd, \
     upload_herd_picture
 from .views_movement_report import GenerateReportView, LivestockMovementReportView

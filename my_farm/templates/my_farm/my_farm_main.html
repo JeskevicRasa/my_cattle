@@ -14,7 +14,7 @@
 
     <div class="row">
       <div class="col-xl-3 col-sm-6 col-12">
-        <a href="{% url 'my_farm:cattle_info' %}">
+        <a href="{% url 'my_farm:cattle_info' %}?query_loss_method_null=True">
           <div class="card mb-3">
             <div class="card-content">
               <div class="card-body">
@@ -24,7 +24,7 @@
                   </div>
                   <div class="media-body text-center">
                     <h3>{{ total_cattle_count }}</h3>
-                    <span>Number of Cattle</span>
+                    <span>Current Livestock </span>
                   </div>
                 </div>
               </div>
@@ -93,7 +93,7 @@
                   <div class="media-body text-center">
                     {% for group in groups %}
                         {% if group.group_name == 'Young_Heifer' %}
-                    <h3 style="color: #EE7B96;">{{ group.active_cattle }}</h3>
+                    <h3>{{ group.active_cattle }}</h3>
                     <span>Young Heifers</span>
                     {% endif %}
                       {% endfor %}
@@ -180,13 +180,13 @@
       </div>
 
       <div class="col-xl-3 col-sm-6 col-12">
-        <a href="{% url 'my_farm:herd_list' %}">
+        <a style="background-color: #fcecc0;" href="{% url 'my_farm:herd_list' %}">
           <div class="card mb-3" style="background-color: #fcecc0;">
             <div class="card-content">
               <div class="card-body">
                 <div class="media d-flex">
                   <div class="media-body text-left">
-                    <h3 class="primary">{{ active_herds_count }}</h3>
+                    <h4 class="primary">{{ active_herds_count }}</h4>
                     <span>Active Herds</span>
                   </div>
                   <div class="align-self-center">
@@ -218,7 +218,7 @@
   </div>
 
   <div class="col-xl-3 col-sm-6 col-12">
-    <a href="{% url 'my_farm:field_list' %}">
+    <a href="{% url 'my_farm:field_list' %}?is_active=True">
       <div class="card mb-3" style="background-color: #e1f2e6; height: 80%;">
         <div class="card-content">
           <div class="card-body">

@@ -34,9 +34,9 @@ This README provides an overview of the project, installation instructions, and 
 
 1. Access the application in your web browser at `http://localhost:8000`.
 2. Log in using your superuser account or create a new account with appropriate permissions.
-3. Add cattle information using the provided forms and interfaces.
-4. Manage cattle movements, group assignments, and other details from the user-friendly dashboard.
-5. Generate reports to analyze cattle data and make informed decisions.
+3. Record cattle, herd, and field information through forms and interfaces provided in the application.
+4. Manage cattle, herd, and field data effortlessly using user-friendly dashboards, tables and updare forms.
+5. Generate reports to track cattle movement over specific time periods, enabling you to make well-informed decisions based on historical data. 
 
 
 Happy cattle management! 🐮

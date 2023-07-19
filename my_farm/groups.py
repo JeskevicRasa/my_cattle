@@ -38,33 +38,32 @@ class GroupNumbers:
         return self.group_name
 
     def quantity(self, start_date_groups, end_date_groups):
+        start_date_list = start_date_groups.get(self.group_name, [])
+        end_date_list = end_date_groups.get(self.group_name, [])
 
-        self.start_date_count = len(start_date_groups[self.group_name])
-        self.end_date_count = len(end_date_groups[self.group_name])
-        self.count_difference = self.end_date_count - self.start_date_count
+        start_date_filtered = [cattle for cattle in start_date_list
+                               if cattle]
 
-    def weight_in_groups_by_date(self, start_date_groups, end_date_groups):
-        start_date_group_data = start_date_groups.get(self.group_name, [])
-        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_group_data), 2)
+        end_date_filtered = [cattle for cattle in end_date_list
+                             if cattle not in self.filter_acquisition_loss_dates]
 
-        end_date_group_data = end_date_groups.get(self.group_name, [])
-        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_group_data), 2)
+        self.start_date_count = len(start_date_filtered)
+        self.end_date_count = len(end_date_filtered)
+        self.count_difference = self.start_date_count - self.end_date_count
+        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_filtered), 2)
+        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_filtered), 2)
 
         self.weight_difference = round((self.end_date_group_weight - self.start_date_group_weight), 2)
 
-    def acquisition_loss(self, start_date, end_date):
+    def birth_acquisition(self, start_date, end_date):
 
-        self.filter_acquisition_loss_dates = [
+        self.filter_birth_acquisition = [
             cattle for cattle in self.group_data
-            if (
-                    ('entry_date' in cattle['cattle'] and cattle['cattle']['entry_date'] is not None and start_date <=
-                     cattle['cattle']['entry_date'] <= end_date)
-                    or ('end_date' in cattle['cattle'] and cattle['cattle']['end_date'] is not None and start_date <=
-                        cattle['cattle']['end_date'] <= end_date)
-            )
+            if 'birth_date' in cattle['cattle'] and cattle['cattle']['birth_date'] is not None
+               and start_date <= cattle['cattle']['birth_date'] <= end_date
         ]
 
-        for item in self.filter_acquisition_loss_dates:
+        for item in self.filter_birth_acquisition:
             cattle = item['cattle']
             weight = item['weight']
 
@@ -72,12 +71,38 @@ class GroupNumbers:
                 if cattle['acquisition_method'] == 'Birth':
                     self.birth_count += 1
                     self.birth_weight += weight
-                elif cattle['acquisition_method'] == 'Purchase':
+
+    def other_acquisition(self, start_date, end_date):
+
+        self.filter_other_acquisition = [
+            cattle for cattle in self.group_data
+            if 'entry_date' in cattle['cattle'] and cattle['cattle']['entry_date'] is not None
+               and start_date <= cattle['cattle']['entry_date'] <= end_date
+        ]
+
+        for item in self.filter_other_acquisition:
+            cattle = item['cattle']
+            weight = item['weight']
+
+            if 'acquisition_method' in cattle:
+                if cattle['acquisition_method'] == 'Purchase':
                     self.purchase_count += 1
                     self.purchase_weight += weight
-                elif cattle['acquisition_method'] == 'Gift':
+                if cattle['acquisition_method'] == 'Gift':
                     self.gift_count += 1
                     self.gift_weight += weight
+
+    def loss_method(self, start_date, end_date):
+
+        self.filter_loss_method = [
+            cattle for cattle in self.group_data
+            if 'end_date' in cattle['cattle'] and cattle['cattle']['end_date'] is not None
+               and start_date <= cattle['cattle']['end_date'] <= end_date
+        ]
+        # print(self.filter_loss_method)
+        for item in self.filter_loss_method:
+            cattle = item['cattle']
+            weight = item['weight']
 
             if 'loss_method' in cattle:
                 if cattle['loss_method'] == 'Death':
@@ -93,17 +118,79 @@ class GroupNumbers:
                     self.gifted_count += 1
                     self.gifted_weight += weight
 
+    def acquisition_loss(self, start_date, end_date):
+        """
+        Calculates the acquisition and loss statistics of the group based on the provided start and end dates.
+
+        The weight in the acquisition or loss column will be estimated based on the acquisition date for the acquisition
+        methods and the end date for the loss methods.
+
+        :param start_date: The start date for the acquisition/loss calculation.
+        :param end_date: The end date for the acquisition/loss calculation.
+        """
+        self.filter_acquisition_loss_dates = [
+            cattle for cattle in self.group_data
+            if (
+                    ('entry_date' in cattle['cattle'] and cattle['cattle']['entry_date'] is not None and start_date <=
+                     cattle['cattle']['entry_date'] <= end_date)
+                    or ('end_date' in cattle['cattle'] and cattle['cattle']['end_date'] is not None and start_date <=
+                        cattle['cattle']['end_date'] <= end_date)
+            )
+        ]
+
+        for item in self.filter_acquisition_loss_dates:
+            cattle = item['cattle']
+            entry_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['entry_date']), 2)
+            end_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['end_date']), 2) if \
+            cattle[
+                'end_date'] is not None else None
+
+            if 'acquisition_method' in cattle:
+                if cattle['acquisition_method'] == 'Birth':
+                    self.birth_count += 1
+                    self.birth_weight += entry_weight
+                elif cattle['acquisition_method'] == 'Purchase':
+                    self.purchase_count += 1
+                    self.purchase_weight += entry_weight
+                elif cattle['acquisition_method'] == 'Gift':
+                    self.gift_count += 1
+                    self.gift_weight += entry_weight
+
+            if 'loss_method' in cattle:
+                if cattle['loss_method'] == 'Death':
+                    self.death_count += 1
+                    self.death_weight += end_weight if end_weight is not None else entry_weight
+                elif cattle['loss_method'] == 'Sold':
+                    self.sold_count += 1
+                    self.sold_weight += end_weight if end_weight is not None else entry_weight
+                elif cattle['loss_method'] == 'Consumed':
+                    self.consumed_count += 1
+                    self.consumed_weight += end_weight if end_weight is not None else entry_weight
+                elif cattle['loss_method'] == 'Gifted':
+                    self.gifted_count += 1
+                    self.gifted_weight += end_weight if end_weight is not None else entry_weight
+
     def check_movement(self, start_date_groups, end_date_groups):
         start_date_list = start_date_groups.get(self.group_name, [])
         end_date_list = end_date_groups.get(self.group_name, [])
 
-        moved_out = [item for item in start_date_list if
-                     item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in end_date_list] and
-                     item not in self.filter_acquisition_loss_dates]
+        moved_out = [
+            item for item in start_date_list
+            if item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in end_date_list]
+            # and item not in self.filter_birth_acquisition
+            # and item not in self.filter_loss_method
+            # and item not in self.filter_other_acquisition
+            and item not in self.filter_acquisition_loss_dates
+        ]
 
-        moved_in = [item for item in end_date_list if
-                    item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in start_date_list] and
-                    item not in self.filter_acquisition_loss_dates]
+        moved_in = [
+            item for item in end_date_list
+            if item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in start_date_list]
+            # and item not in self.filter_birth_acquisition
+            # and item not in self.filter_loss_method
+            # and item not in self.filter_other_acquisition
+            and item not in self.filter_acquisition_loss_dates
+        ]
 
         self.moved_in = len(moved_in)
         self.moved_out = len(moved_out)
@@ -166,24 +253,22 @@ class CattleGroupData:
         self.active_cattle = 0
 
     def cattle_data(self):
+        self.group_data = [cattle_data for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None]
         for cattle_data in self.group_data:
-            if cattle_data['cattle']['end_date'] is not None:
-                self.id = cattle_data['cattle']['id']
-                self.type = cattle_data['cattle']['type']
-                self.number = cattle_data['cattle']['number']
-                self.name = cattle_data['cattle']['name']
-                self.gender = cattle_data['cattle']['gender']
-                self.breed = cattle_data['cattle']['breed']
-                self.birth_date = cattle_data['cattle']['birth_date']
-                self.acquisition_method = cattle_data['cattle']['acquisition_method']
-                self.entry_date = cattle_data['cattle']['entry_date']
-                self.comments = cattle_data['cattle']['comments']
+            self.id = cattle_data['cattle']['id']
+            self.type = cattle_data['cattle']['type']
+            self.number = cattle_data['cattle']['number']
+            self.name = cattle_data['cattle']['name']
+            self.gender = cattle_data['cattle']['gender']
+            self.breed = cattle_data['cattle']['breed']
+            self.birth_date = cattle_data['cattle']['birth_date']
+            self.acquisition_method = cattle_data['cattle']['acquisition_method']
+            self.entry_date = cattle_data['cattle']['entry_date']
+            self.comments = cattle_data['cattle']['comments']
+
 
     def count_active_cattle(self):
-        print(self.group_data)
-        self.active_cattle = sum(
-            1 for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None)
-
+        self.active_cattle = sum(1 for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None)
 
 class GroupsManagement:
     def __init__(self):

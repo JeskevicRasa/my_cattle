@@ -13,7 +13,7 @@
 </form>
 
 
-    <h3 style="text-align: left; margin: 20px;">"{{ query }}" search</h3>
+    <h3 style="text-align: center; margin: 20px;">-{{ query }}- search result</h3>
 
 
 
@@ -50,7 +50,11 @@
                 <td>{{ cattle.entry_date|date:"Y-m-d" }}</td>
                 <td>{{ cattle.loss_method }}</td>
                 <td>{{ cattle.end_date|date:"Y-m-d" }}</td>
-                <td>{{ cattle.comments }}</td>
+                <td>
+                <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:5 }}</div>
+                <div id="comments-full-{{ cow.id }}" style="display: none;">{{ cow.comments }}</div>
+                <small><a href="#" data-cattle-id="{{ cow.id }}" data-action="toggle-comments" onclick="toggleComments({{ cow.id }}); return false;" style="display: inline;">Show More</a></small>
+                </td>
             </tr>
             {% empty %}
             <tr>

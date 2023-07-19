@@ -23,16 +23,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 
-    <!-- Messages -->
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'info' %}success{% endif %}" role="alert">
-                {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-
 <!-- Navigation -->
 
 <nav class="navbar navbar-expand-lg static-top navbar-custom">
@@ -61,7 +51,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownCattle">
                         <a class="dropdown-item" href="{% url 'my_farm:add_cattle' %}">Add Cattle</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'my_farm:cattle_info' %}">Cattle Management</a>
+                        <a class="dropdown-item" href="{% url 'my_farm:cattle_info' %}">All Cattle</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'my_farm:generate_report' %}">Movement report</a>
                     </div>
@@ -135,58 +125,25 @@
 </script>
 
 
-
   <script>
-     // Function to show the full comments when "Show More" is clicked
-    function showFullComments(cowId) {
-        const shortComments = document.querySelector(`#comments-short-${cowId}`);
-        const fullComments = document.querySelector(`#comments-full-${cowId}`);
-        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
-        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
+    function toggleComments(cattleId) {
+      const shortComments = document.querySelector(`#comments-short-${cattleId}`);
+      const fullComments = document.querySelector(`#comments-full-${cattleId}`);
+      const toggleLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="toggle-comments"]`);
 
-        // Hide the short comments and show the full comments
+      if (shortComments.style.display === "none") {
+        // Show short comments and hide full comments
+        shortComments.style.display = "";
+        fullComments.style.display = "none";
+        toggleLink.textContent = "Show More";
+      } else {
+        // Show full comments and hide short comments
         shortComments.style.display = "none";
         fullComments.style.display = "";
-
-        // Hide the "Show More" link and show the "Show Less" link
-        showMoreLink.style.display = "none";
-        showLessLink.style.display = "";
+        toggleLink.textContent = "Show Less";
+      }
     }
-
-    // Function to show the short comments when "Show Less" is clicked
-    function showShortComments(cowId) {
-        const shortComments = document.querySelector(`#comments-short-${cowId}`);
-        const fullComments = document.querySelector(`#comments-full-${cowId}`);
-        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
-        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
-
-        // Hide the full comments and show the short comments
-        fullComments.style.display = "none";
-        shortComments.style.display = "";
-
-        // Hide the "Show Less" link and show the "Show More" link
-        showLessLink.style.display = "none";
-        showMoreLink.style.display = "";
-    }
-
-
-    const form = document.querySelector('#column-form');
-    const table = document.querySelector('#cattle-table');
-    const columns = Array.from(document.querySelectorAll('[name="columns"]'));
-
-    // Show/hide columns based on user selection
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      columns.forEach((column) => {
-        const columnName = column.value;
-        const columnCells = Array.from(table.querySelectorAll(`.cattle-${columnName}`));
-        columnCells.forEach((cell) => {
-          cell.style.display = column.checked ? '' : 'none';
-        });
-      });
-    });
   </script>
-
 </body>
 </html>
 

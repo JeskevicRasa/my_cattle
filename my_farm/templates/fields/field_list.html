@@ -5,6 +5,12 @@
 
 <h3 class="text-uppercase" style="text-align: center; margin: 20px;">My Fields</h3>
 
+<!-- Search Tool -->
+<form method="GET" action="{% url 'my_farm:search_field' %}" style="margin-top: 20px;">
+    <input type="text" name="query" placeholder="Search Field">
+    <button type="submit">Search</button>
+</form>
+
 <form method="POST" action="{% url 'my_farm:add_field' %}">
   {% csrf_token %}
   <button type="submit" class="btn btn-custom">New Field</button>
@@ -12,18 +18,19 @@
 
 <p></p>
 
+<div class="table-responsive">
 <table id="field-table" class="table table-bordered">
   <thead>
     <tr class="column-names-fields">
       <th>Name</th>
+      <th>Active</th>
       <th>Location</th>
       <th>Coordinates</th>
       <th>Field Size</th>
       <th>Size Unit</th>
       <th>Field Type</th>
-      <th>Active</th>
-      <th>Description</th>
       <th>Number of Herds</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
@@ -32,20 +39,23 @@
       <td>
         <a href="{% url 'my_farm:field_detail' field.id %}">{{ field.name }}</a>
       </td>
+      <td>{{ field.is_active }}</td>
       <td>{{ field.location }}</td>
       <td>{{ field.coordinates }}</td>
       <td>{{ field.field_size }}</td>
-      <td>{{ field.get_size_unit_display }}</td>
+      <td>{{ field.size_unit }}</td>
       <td>{{ field.field_type }}</td>
-      <td>{{ field.is_active }}</td>
-      <td>{{ field.description }}</td>
-      <td>{{ field.count_herd }}
-        <small><a href="{% url 'my_farm:herd_list_by_field' field.id %}">View Herds</a></small>
+      <td><a href="{% url 'my_farm:herd_list_by_field' field.id %}">{{ field.count_herd }}</a></td>
+      <td>
+        <div id="comments-short-{{ field.id }}">{{ field.description|truncatechars:5 }}</div>
+        <div id="comments-full-{{ field.id }}" style="display: none;">{{ field.description }}</div>
+        <small><a href="#" data-cattle-id="{{ field.id }}" data-action="toggle-comments" onclick="toggleComments({{ field.id }}); return false;" style="display: inline;">Show More</a></small>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 {% if page_obj.has_other_pages %}
 <div class="pagination justify-content-center">

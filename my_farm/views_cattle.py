@@ -9,8 +9,14 @@ from my_farm.models import Cattle, Herd
 
 
 def cattle_info(request):
+    query_loss_method_null = request.GET.get('query_loss_method_null')
+
     cattle = Cattle.objects.filter(deleted=False)
-    paginator = Paginator(cattle, 3)  # Show 3 cattle per page
+
+    if query_loss_method_null:
+        cattle = cattle.filter(loss_method__isnull=True)
+
+    paginator = Paginator(cattle, 6)  # Show 3 cattle per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -85,7 +91,7 @@ def search_cattle(request):
         'cattle_list': cattle_list,
         'query': query,
     }
-    return render(request, 'my_farm/search_cattle.html', context)
+    return render(request, 'cattle/search_cattle.html', context)
 
 
 def add_cattle(request):

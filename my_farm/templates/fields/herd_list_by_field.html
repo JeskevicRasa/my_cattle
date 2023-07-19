@@ -8,15 +8,16 @@
     Herds in - <a style="color:blue;" href="{% url 'my_farm:field_detail' field.id %}">{{ field.name }}</a> - field
 </h3>
 
+<div class="table-responsive">
 <table class="table table-bordered">
   <thead>
     <tr class="column-names-fields">
       <th>Herd Name</th>
-      <th>Location</th>
-      <th>Description</th>
       <th>Active</th>
+      <th>Location</th>
       <th>Herd Leader</th>
       <th>Number of Cattle</th>
+      <th>Description</th>
     </tr>
   </thead>
   <tbody>
@@ -25,13 +26,13 @@
       <td>
         <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
       </td>
-      <td>{{ herd.location }}</td>
-      <td>{{ herd.description }}</td>
       <td>{{ herd.is_active }}</td>
+      <td>{{ herd.location }}</td>
       <td>{{ herd.herd_leader }}</td>
         <td>
         <a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">{{ herd.count_cattle }}</a>
       </td>
+      <td>{{ herd.description }}</td>
     </tr>
     {% empty %}
     <tr>
@@ -40,5 +41,6 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
 
 {% endblock %}

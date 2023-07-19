@@ -1,14 +1,18 @@
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from my_cattle.forms import FieldForm
 from .models import Field, Herd
 
 
 def field_list(request):
+    is_active = request.GET.get('is_active')
     fields = Field.objects.annotate(count_herd=Count('field_herds'))
 
-    paginator = Paginator(fields, 5)  # Show 10 herds per page
+    if is_active == 'True':
+        fields = fields.filter(is_active=True)
+
+    paginator = Paginator(fields, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -46,23 +50,11 @@ def update_field(request, field_id):
         if form.is_valid():
             updated_field = form.save()
 
-            herd_ids = request.POST.getlist('herd')
-            herds = Herd.objects.filter(id__in=herd_ids)
-
-            # Deallocate herds from their old fields
-            Herd.objects.filter(field=updated_field).update(field=None)
-
-            # Allocate herds to the updated field
-            herds.update(field=updated_field)
-
             return redirect('my_farm:field_detail', field_id=field_id)
     else:
         form = FieldForm(instance=field)
 
-    # Retrieve the herd_queryset
-    herd_queryset = Herd.objects.all()
-
-    return render(request, 'fields/update_field.html', {'form': form, 'field': field, 'herd_queryset': herd_queryset})
+    return render(request, 'fields/update_field.html', {'form': form, 'field': field})
 
 
 def field_detail(request, field_id=None):
@@ -95,6 +87,32 @@ def herd_list_by_field(request, field_id):
     return render(request, 'fields/herd_list_by_field.html', {'field': field, 'herd_list': herd_list})
 
 
+def search_field(request):
+    query = request.GET.get('query')
 
+    if query:
+        try:
+            is_active_value = {'true': True, 'false': False}[query.lower()]
+        except KeyError:
+            is_active_value = None
+
+        field_list = Field.objects.annotate(count_herd=Count('field_herds')).filter(
+            Q(name__icontains=query) |
+            Q(location__icontains=query) |
+            Q(coordinates__icontains=query) |
+            Q(field_size__icontains=query) |
+            Q(size_unit__icontains=query) |
+            Q(field_type__icontains=query) |
+            Q(description__icontains=query) |
+            Q(is_active=is_active_value)
+        )
+    else:
+        field_list = Field.objects.annotate(count_herd=Count('field_herds'))
+
+    context = {
+        'field_list': field_list,
+        'query': query,
+    }
+    return render(request, 'fields/search_field.html', context)
 
 

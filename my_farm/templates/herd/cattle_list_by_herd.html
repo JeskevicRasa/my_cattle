@@ -32,10 +32,9 @@
       <td>{{ cattle.breed }}</td>
       <td>{{ cattle.loss_method }}</td>
       <td>
-        <div id="comments-short-{{ cattle.id }}">{{ cattle.comments|truncatechars:20 }}</div>
+        <div id="comments-short-{{ cattle.id }}">{{ cattle.comments|truncatechars:5 }}</div>
         <div id="comments-full-{{ cattle.id }}" style="display: none;">{{ cattle.comments }}</div>
-        <a href="#" data-cattle-id="{{ cattle.id }}" data-action="show-more" onclick="showFullComments({{ cattle.id }}); return false;">Show More</a>
-        <a href="#" data-cattle-id="{{ cattle.id }}" data-action="show-less" onclick="showShortComments({{ cattle.id }}); return false;" style="display: none;">Show Less</a>
+        <small><a href="#" data-cattle-id="{{ cattle.id }}" data-action="toggle-comments" onclick="toggleComments({{ cattle.id }}); return false;" style="display: inline;">Show More</a></small>
       </td>
     </tr>
     {% empty %}
@@ -46,4 +45,6 @@
   </tbody>
 </table>
 </div>
+
+
 {% endblock %}

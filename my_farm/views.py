@@ -60,7 +60,8 @@ def group_data(request, group_name):
         'groups': groups,
         'selected_group': selected_group
     }
-    return render(request, 'my_farm/search_cattle.html', context)
+    return render(request, 'my_farm/group_data.html', context)
+
 
 class GroupNumbersEncoder(json.JSONEncoder):
     def default(self, obj):

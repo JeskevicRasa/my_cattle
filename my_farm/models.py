@@ -70,8 +70,8 @@ class Cattle(models.Model):
 class Field(models.Model):
 
     SIZE_CHOICES = [
-            ('ha', 'Hectares'),
-            ('ac', 'Acres'),
+            ('ha', 'Ha'),
+            ('ac', 'Ac'),
         ]
 
     name = models.CharField(max_length=80, blank=False)

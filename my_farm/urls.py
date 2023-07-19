@@ -4,7 +4,8 @@ from .views import home, group_data
 from .views_herd import herd_list, add_herd, herd_detail, cattle_list_by_herd, search_herd, update_herd, \
     upload_herd_picture
 from .views_movement_report import GenerateReportView, LivestockMovementReportView
-from .views_field import field_list, field_detail, herd_list_by_field, update_field, add_field, upload_field_picture
+from .views_field import field_list, field_detail, herd_list_by_field, update_field, add_field, upload_field_picture, \
+    search_field
 from .views_cattle import cattle_info, add_cattle, update_cattle, search_cattle, cattle_detail, \
     delete_confirmation_page, CattleDeleteView, upload_cattle_picture
 
@@ -44,6 +45,7 @@ urlpatterns = [
     path('fields/<int:field_id>/herd/', herd_list_by_field, name='herd_list_by_field'),
     path('fields/update_field/<int:field_id>/', update_field, name='update_field'),
     path('fields/upload_field_picture/<int:field_id>/', upload_field_picture, name='upload_field_picture'),
+    path('fields/search_field/', search_field, name='search_field')
 
 
 ]

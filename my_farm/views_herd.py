@@ -7,7 +7,8 @@ from my_farm.models import Cattle, Herd
 
 
 def herd_list(request):
-    herds = Herd.objects.annotate(count_cattle=Count('cattle', filter=Q(cattle__deleted=False)))
+    herds = Herd.objects.annotate(count_cattle=Count('cattle', filter=Q(cattle__deleted=False,
+                                                                        cattle__loss_method__isnull=True)))
 
     paginator = Paginator(herds, 5)  # Show 10 herds per page
     page_number = request.GET.get('page')
@@ -29,13 +30,13 @@ def add_herd(request):
             cattle_ids = request.POST.getlist('cattle')
             if cattle_ids:
                 for cattle_id in cattle_ids:
-                    cattle = Cattle.objects.get(id=cattle_id)
+                    cattle = Cattle.objects.get(id=cattle_id).filter(deleted=False, loss_method__isnull=True)
                     cattle.herd = herd
                     cattle.save()
 
             herd_leader_id = request.POST.get('herd_leader')
             if herd_leader_id:
-                herd_leader = Cattle.objects.get(id=herd_leader_id)
+                herd_leader = Cattle.objects.get(id=herd_leader_id).filter(deleted=False, loss_method__isnull=True)
                 herd.herd_leader = herd_leader
                 herd.save()
 
@@ -48,6 +49,7 @@ def add_herd(request):
 
     return render(request, 'herd/add_herd.html', {'form': form, 'cattle_queryset': cattle_queryset})
 
+
 def update_herd(request, herd_id=None):
     herd = get_object_or_404(Herd, id=herd_id) if herd_id else None
 
@@ -56,20 +58,18 @@ def update_herd(request, herd_id=None):
         if form.is_valid():
             updated_herd = form.save()
 
-            cattle_ids = request.POST.getlist('cattle')
-            cattle = Cattle.objects.filter(id__in=cattle_ids)
-
-            # Deallocate cattle from their old herds
-            Cattle.objects.filter(herd=updated_herd).update(herd=None)
-
-            # Allocate cattle to the updated herd
-            cattle.update(herd=updated_herd)
+            herd_leader_id = request.POST.get('herd_leader')
+            if herd_leader_id:
+                herd_leader = Cattle.objects.get(id=herd_leader_id)
+                updated_herd.herd_leader = herd_leader
+                updated_herd.save()
 
             return redirect('my_farm:herd_detail', herd_id=herd_id)
     else:
         form = HerdForm(instance=herd)
 
-    form.fields['cattle'].queryset = Cattle.objects.filter(deleted=False)  # Set the cattle queryset for the form field
+    form.fields['cattle'].queryset = Cattle.objects.filter(deleted=False, loss_method__isnull=True)
+    form.fields['herd_leader'].queryset = Cattle.objects.filter(deleted=False, loss_method__isnull=True)
 
     return render(request, 'herd/update_herd.html', {'form': form, 'herd': herd})
 
@@ -78,7 +78,7 @@ def herd_detail(request, herd_id=None):
     herd = get_object_or_404(Herd, id=herd_id) if herd_id else None
 
     if herd:
-        herd.cattle_count = herd.cattle_set.filter(deleted=False).count()
+        herd.cattle_count = herd.cattle_set.filter(deleted=False, loss_method__isnull=True).count()
 
     return render(request, 'herd/herd_detail.html', {'herd': herd})
 
@@ -99,7 +99,7 @@ def upload_herd_picture(request, herd_id):
 
 def cattle_list_by_herd(request, herd_id):
     herd = get_object_or_404(Herd, id=herd_id)
-    cattle_list = Cattle.objects.filter(herd=herd, deleted=False)
+    cattle_list = Cattle.objects.filter(herd=herd, deleted=False, loss_method__isnull=True)
 
     context = {
         'herd': herd,
@@ -118,7 +118,7 @@ def search_herd(request):
             is_active_value = None
 
         herd_list = Herd.objects.annotate(
-            num_cattle=Count('cattle')
+            count_cattle=Count('cattle')
         ).filter(
             Q(name__icontains=query) |
             Q(location__icontains=query) |
@@ -126,11 +126,11 @@ def search_herd(request):
             Q(description__icontains=query) |
             Q(start_date__icontains=query) |
             Q(herd_leader__name__icontains=query) |
-            Q(num_cattle__icontains=query) |  # Include search by number of cattle
-            Q(is_active=is_active_value)  # Handle boolean values separately
+            Q(count_cattle__icontains=query) |
+            Q(is_active=is_active_value)
         )
     else:
-        herd_list = Herd.objects.annotate(num_cattle=Count('cattle'))
+        herd_list = Herd.objects.annotate(count_cattle=Count('cattle'))
 
     context = {
         'herd_list': herd_list,

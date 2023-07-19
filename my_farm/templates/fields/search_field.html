@@ -1,0 +1,66 @@
+{% extends 'base_user.html' %}
+{% block content %}
+
+<title>Search Herd</title>
+
+<body>
+
+<p></p>
+
+<form method="GET" action="{% url 'my_farm:search_field' %}">
+    <input type="text" name="query" value="{{ query }}" placeholder="Search Field">
+    <button type="submit">Search</button>
+</form>
+
+
+    <h3 style="text-align: center; margin: 20px; color: #5a705c;">-{{ query }}- search result</h3>
+
+
+
+    <div class="table-responsive">
+        <div class="table-container">
+<table id="herd-table" class="table table-bordered">
+  <thead>
+    <tr class="column-names-fields">
+              <th class="field-name">Name</th>
+              <th class="field-gender">Active</th>
+              <th class="field-breed">Location</th>
+              <th class="field-birth_date">Coordinates</th>
+              <th class="field-acquisition_method">Field Size</th>
+              <th class="field-entry_date">Size Unit</th>
+              <th class="field-loss_method">Field Type</th>
+              <th class="field-end_date">Number of Herds</th>
+              <th class="field-end_date">Description</th>
+            </tr>
+          </thead>
+        <tbody>
+            {% for field in field_list %}
+            <tr>
+                      <td>
+        <a href="{% url 'my_farm:field_detail' field.id %}">{{ field.name }}</a>
+      </td>
+                <td>{{ field.is_active }}</td>
+                <td>{{ field.location }}</td>
+                <td>{{ field.coordinates }}</td>
+                <td>{{ field.field_size }}</td>
+                <td>{{ field.size_unit }}</td>
+                <td>{{ field.field_type }}</td>
+                <td><a href="{% url 'my_farm:herd_list_by_field' field.id %}">{{ field.count_herd }}</a></td>
+       <td>
+        <div id="comments-short-{{ field.id }}">{{ field.description|truncatechars:5 }}</div>
+        <div id="comments-full-{{ field.id }}" style="display: none;">{{ field.description }}</div>
+        <small><a href="#" data-cattle-id="{{ field.id }}" data-action="toggle-comments" onclick="toggleComments({{ field.id }}); return false;" style="display: inline;">Show More</a></small>
+      </td>
+            {% empty %}
+            <tr>
+                <td colspan="3">No field found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        </div>
+    </div>
+</body>
+
+
+{% endblock %}

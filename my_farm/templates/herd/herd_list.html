@@ -1,77 +1,81 @@
 {% extends 'base_user.html' %}
+
 {% block content %}
+  <title>Herds</title>
 
-<title>Herds</title>
+  <h3 class="text-uppercase" style="text-align: center; margin: 20px;">My Herds</h3>
 
-<h3 class="text-uppercase" style="text-align: center; margin: 20px;">My Herds</h3>
-
-<!-- Search Tool -->
-<form method="GET" action="{% url 'my_farm:search_herd' %}" style="margin-top: 20px;">
+  <!-- Search Tool -->
+  <form method="GET" action="{% url 'my_farm:search_herd' %}" style="margin-top: 20px;">
     <input type="text" name="query" placeholder="Search in Herds">
     <button type="submit">Search</button>
-</form>
+  </form>
 
-<form method="POST" action="{% url 'my_farm:add_herd' %}">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-custom">New Herd</button>
-</form>
+  <form method="POST" action="{% url 'my_farm:add_herd' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-custom">New Herd</button>
+  </form>
 
-<p></p>
+  <p></p>
 
-<table id="herd-table" class="table table-bordered">
-  <thead>
-    <tr class="column-names-herds">
-      <th>Name</th>
-      <th>Location</th>
-      <th>Field</th>
-      <th>Description</th>
-      <th>Start Date</th>
-      <th>Is Active</th>
-      <th>Herd Leader</th>
-      <th>Number of Cattle</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for herd in page_obj %}
-    <tr>
-      <td>
-        <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
-      </td>
-      <td>{{ herd.location }}</td>
-      <td>{{ herd.field }}</td>
-      <td>{{ herd.description }}</td>
-      <td>{{ herd.start_date|date:"Y-m-d" }}</td>
-      <td>{{ herd.is_active }}</td>
-      <td>{{ herd.herd_leader }}</td>
-      <td>{{ herd.count_cattle }}
-        <small><a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">View Cattle</a></small>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <div class="table-responsive">
+    <table id="herd-table" class="table table-bordered">
+      <thead>
+        <tr class="column-names-herds">
+          <th>Name</th>
+          <th>Active</th>
+          <th>Field</th>
+          <th>Start Date</th>
+          <th>Herd Leader</th>
+          <th>Number of Cattle</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for herd in page_obj %}
+          <tr>
+            <td>
+              <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
+            </td>
+            <td>{{ herd.is_active }}</td>
+            <td>
+              {% if herd.field %}
+                <a href="{% url 'my_farm:field_detail' herd.field.id %}">{{ herd.field }}</a>
+              {% else %}
+                No field.
+              {% endif %}
+            </td>
+            <td>{{ herd.start_date|date:"Y-m-d" }}</td>
+            <td>{{ herd.herd_leader }}</td>
+            <td>
+              <a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">{{ herd.count_cattle }}</a>
+            </td>
+            <td>
+              <div id="comments-short-{{ herd.id }}">{{ herd.description|truncatechars:5 }}</div>
+              <div id="comments-full-{{ herd.id }}" style="display: none;">{{ herd.description }}</div>
+              <small>
+                <a href="#" data-cattle-id="{{ herd.id }}" data-action="toggle-comments" onclick="toggleComments({{ herd.id }}); return false;" style="display: inline;">Show More</a>
+              </small>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-{% if page_obj.has_other_pages %}
-<div class="pagination justify-content-center">
-  {% if page_obj.has_previous %}
-  <a href="?page=1" class="page-link">&laquo; First</a>
-  <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&lsaquo; Previous</a>
-  {% endif %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1" class="page-link">&laquo; First</a>
+      <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&lsaquo; Previous</a>
+    {% endif %}
 
-  {% for num in page_obj.paginator.page_range %}
-  {% if page_obj.number == num %}
-  <a href="?page={{ num }}" class="page-link active">{{ num }}</a>
-  {% else %}
-  <a href="?page={{ num }}" class="page-link">{{ num }}</a>
-  {% endif %}
-  {% endfor %}
+    <span class="current-page">{{ page_obj.number }}</span>
 
-  {% if page_obj.has_next %}
-  <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next &rsaquo;</a>
-  <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
-  {% endif %}
-</div>
-{% endif %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next &rsaquo;</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
+    {% endif %}
+  </div>
+
 
 {% endblock %}
-

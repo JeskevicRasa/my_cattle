@@ -4,7 +4,7 @@
 <title>Cattle info</title>
 
 
-<h3 class="text-uppercase" style="text-align: center; margin: 20px;">All Cattle</h3>
+<h3 class="text-uppercase" style="text-align: center; margin: 20px;">Cattle</h3>
 
     <form method="POST" action="{% url 'my_farm:add_cattle' %}">
         {% csrf_token %}
@@ -80,11 +80,10 @@
       <td class="cattle-entry_date">{{ cow.entry_date|date:"Y-m-d" }}</td>
       <td class="cattle-loss_method">{{ cow.loss_method }}</td>
       <td class="cattle-end_date">{{ cow.end_date|date:"Y-m-d" }}</td>
-      <td class="cattle-comments">
-        <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:20 }}</div>
+     <td>
+        <div id="comments-short-{{ cow.id }}">{{ cow.comments|truncatechars:5 }}</div>
         <div id="comments-full-{{ cow.id }}" style="display: none;">{{ cow.comments }}</div>
-        <a href="#" data-cow-id="{{ cow.id }}" data-action="show-more" onclick="showFullComments({{ cow.id }}); return false;">Show More</a>
-        <a href="#" data-cow-id="{{ cow.id }}" data-action="show-less" onclick="showShortComments({{ cow.id }}); return false;" style="display: none;">Show Less</a>
+        <small><a href="#" data-cattle-id="{{ cow.id }}" data-action="toggle-comments" onclick="toggleComments({{ cow.id }}); return false;" style="display: inline;">Show More</a></small>
       </td>
     </tr>
     {% endfor %}
@@ -114,57 +113,4 @@
         </div>
     {% endif %}
 
-{% block scripts %}
-  <script>
-     // Function to show the full comments when "Show More" is clicked
-    function showFullComments(cowId) {
-        const shortComments = document.querySelector(`#comments-short-${cowId}`);
-        const fullComments = document.querySelector(`#comments-full-${cowId}`);
-        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
-        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
-
-        // Hide the short comments and show the full comments
-        shortComments.style.display = "none";
-        fullComments.style.display = "";
-
-        // Hide the "Show More" link and show the "Show Less" link
-        showMoreLink.style.display = "none";
-        showLessLink.style.display = "";
-    }
-
-    // Function to show the short comments when "Show Less" is clicked
-    function showShortComments(cowId) {
-        const shortComments = document.querySelector(`#comments-short-${cowId}`);
-        const fullComments = document.querySelector(`#comments-full-${cowId}`);
-        const showMoreLink = document.querySelector(`a[data-cow-id="${cowId}"]`);
-        const showLessLink = document.querySelector(`a[data-cow-id="${cowId}"][data-action="show-less"]`);
-
-        // Hide the full comments and show the short comments
-        fullComments.style.display = "none";
-        shortComments.style.display = "";
-
-        // Hide the "Show Less" link and show the "Show More" link
-        showLessLink.style.display = "none";
-        showMoreLink.style.display = "";
-    }
-
-
-    const form = document.querySelector('#column-form');
-    const table = document.querySelector('#cattle-table');
-    const columns = Array.from(document.querySelectorAll('[name="columns"]'));
-
-    // Show/hide columns based on user selection
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      columns.forEach((column) => {
-        const columnName = column.value;
-        const columnCells = Array.from(table.querySelectorAll(`.cattle-${columnName}`));
-        columnCells.forEach((cell) => {
-          cell.style.display = column.checked ? '' : 'none';
-        });
-      });
-    });
-  </script>
-
-{% endblock %}
 {% endblock %}

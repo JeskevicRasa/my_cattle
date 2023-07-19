@@ -17,7 +17,7 @@
           <th>Birth Date</th>
           <th>Acquisition Method</th>
           <th>Entry Date</th>
-          <th>Comments</th>
+          <th class="comments">Comments</th>
         </tr>
       </thead>
       <tbody>
@@ -25,9 +25,9 @@
           {% for cattle in group.group_data %}
             <tr>
               <td>{{ cattle.cattle.type }}</td>
-      <td class="cattle-number">
-        <a href="{% url 'my_farm:cattle_detail' cattle.cattle.id %}">{{ cattle.cattle.number }}</a>
-      </td>
+              <td class="cattle-number">
+                <a href="{% url 'my_farm:cattle_detail' cattle.cattle.id %}">{{ cattle.cattle.number }}</a>
+              </td>
               <td>{{ cattle.cattle.name }}</td>
               <td>{{ cattle.cattle.gender }}</td>
               <td>{{ cattle.cattle.breed }}</td>
@@ -37,54 +37,41 @@
               <td>
                 <div id="comments-short-{{ cattle.cattle.id }}">{{ cattle.cattle.comments|truncatechars:20 }}</div>
                 <div id="comments-full-{{ cattle.cattle.id }}" style="display: none;">{{ cattle.cattle.comments }}</div>
-                <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="show-more" onclick="showFullComments({{ cattle.cattle.id }}); return false;">Show More</a>
-                <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="show-less" onclick="showShortComments({{ cattle.cattle.id }}); return false;" style="display: none;">Show Less</a>
-                    </td>
-    </tr>
-    {% empty %}
-            <tr>
-                <td colspan="3">No cattle in the group.</td>
+                <small>
+                  <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="toggle-comments" onclick="toggleComments({{ cattle.cattle.id }}); return false;" style="display: inline;">Show More</a>
+                </small>
+              </td>
             </tr>
-
+          {% empty %}
+            <tr>
+              <td colspan="9">No cattle in the group.</td>
+            </tr>
           {% endfor %}
         {% endfor %}
       </tbody>
     </table>
   </div>
 
-  {% block scripts %}
+{% block scripts %}
   <script>
-    // Function to show the full comments when "Show More" is clicked
-    function showFullComments(cattleId) {
+    function toggleComments(cattleId) {
       const shortComments = document.querySelector(`#comments-short-${cattleId}`);
       const fullComments = document.querySelector(`#comments-full-${cattleId}`);
-      const showMoreLink = document.querySelector(`a[data-cattle-id="${cattleId}"]`);
-      const showLessLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="show-less"]`);
+      const toggleLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="toggle-comments"]`);
 
-      // Hide the short comments and show the full comments
-      shortComments.style.display = "none";
-      fullComments.style.display = "";
-
-      // Hide the "Show More" link and show the "Show Less" link
-      showMoreLink.style.display = "none";
-      showLessLink.style.display = "";
-    }
-
-    // Function to show the short comments when "Show Less" is clicked
-    function showShortComments(cattleId) {
-      const shortComments = document.querySelector(`#comments-short-${cattleId}`);
-      const fullComments = document.querySelector(`#comments-full-${cattleId}`);
-      const showMoreLink = document.querySelector(`a[data-cattle-id="${cattleId}"]`);
-      const showLessLink = document.querySelector(`a[data-cattle-id="${cattleId}"][data-action="show-less"]`);
-
-      // Hide the full comments and show the short comments
-      fullComments.style.display = "none";
-      shortComments.style.display = "";
-
-      // Hide the "Show Less" link and show the "Show More" link
-      showLessLink.style.display = "none";
-      showMoreLink.style.display = "";
+      if (shortComments.style.display === "none") {
+        // Show short comments and hide full comments
+        shortComments.style.display = "";
+        fullComments.style.display = "none";
+        toggleLink.textContent = "Show More";
+      } else {
+        // Show full comments and hide short comments
+        shortComments.style.display = "none";
+        fullComments.style.display = "";
+        toggleLink.textContent = "Show Less";
+      }
     }
   </script>
-  {% endblock %}
+{% endblock %}
+
 {% endblock %}

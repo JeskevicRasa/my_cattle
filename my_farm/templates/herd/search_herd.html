@@ -13,7 +13,7 @@
 </form>
 
 
-    <h3 style="text-align: center; margin: 20px; color: #b5a369;">"{{ query }}" Search Result</h3>
+    <h3 style="text-align: center; margin: 20px; color: #b5a369;">-{{ query }}- search result</h3>
 
 
 
@@ -23,31 +23,40 @@
   <thead>
     <tr class="column-names-herds">
               <th class="cattle-name">Name</th>
-              <th class="cattle-gender">Location</th>
-              <th class="cattle-breed">Field</th>
-              <th class="cattle-birth_date">Description</th>
-              <th class="cattle-acquisition_method">Start Date</th>
               <th class="cattle-entry_date">Active</th>
+              <th class="cattle-breed">Field</th>
+              <th class="cattle-acquisition_method">Start Date</th>
               <th class="cattle-loss_method">Herd Leader</th>
               <th class="cattle-end_date">Number of Cattle</th>
+              <th class="cattle-birth_date">Description</th>
             </tr>
           </thead>
         <tbody>
             {% for herd in herd_list %}
             <tr>
-                      <td>
-        <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
-      </td>
-                <td>{{ herd.location }}</td>
-                <td>{{ herd.field }}</td>
-                <td>{{ herd.description }}</td>
-                <td>{{ herd.start_date|date:"Y-m-d" }}</td>
+                <td>
+                <a href="{% url 'my_farm:herd_detail' herd.id %}">{{ herd.name }}</a>
+                </td>
                 <td>{{ herd.is_active }}</td>
+                <td>
+              {% if herd.field %}
+                <a href="{% url 'my_farm:field_detail' herd.field.id %}">{{ herd.field }}</a>
+              {% else %}
+                No field.
+              {% endif %}
+                </td>
+                <td>{{ herd.start_date|date:"Y-m-d" }}</td>
                 <td>{{ herd.herd_leader }}</td>
-                <td>{{ herd.num_cattle }}
-        <small><a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">View Cattle</a></small>
+                <td>
+                <a href="{% url 'my_farm:cattle_list_by_herd' herd.id %}">{{ herd.count_cattle }}</a>
+                </td>
+                 <td>
+                <div id="comments-short-{{ herd.id }}">{{ herd.description|truncatechars:5 }}</div>
+                <div id="comments-full-{{ herd.id }}" style="display: none;">{{ herd.description }}</div>
+              <small><a href="#" data-cattle-id="{{ herd.id }}" data-action="toggle-comments" onclick="toggleComments({{ herd.id }}); return false;" style="display: inline;">Show More</a></small>
                 </td>
             </tr>
+
             {% empty %}
             <tr>
                 <td colspan="3">No herd found.</td>

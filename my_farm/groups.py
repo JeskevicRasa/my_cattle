@@ -4,8 +4,17 @@ from .constants import FEMALE_BIRTH_WEIGHT, MALE_BIRTH_WEIGHT, FEMALE_MAX_WEIGHT
 
 
 class GroupNumbers:
+    """
+    Represents a group of numbers with various calculations and data.
+    """
 
     def __init__(self, group_name, group_data):
+        """
+        Initializes a GroupNumbers instance with the provided group name and group data.
+
+        :param group_name: The name of the group.
+        :param group_data: The data associated with the group.
+        """
         self.filter_acquisition_loss_dates = None
         self.group_name = group_name
         self.group_data = group_data
@@ -35,25 +44,47 @@ class GroupNumbers:
         self.weight_moved_out = 0
 
     def __repr__(self):
+        """
+        Returns a string representation of the GroupNumbers instance.
+
+        :return: The string representation of the instance.
+        """
         return self.group_name
 
-    def quantity(self, start_date_groups, end_date_groups):
+    def quantity(self, start_date_groups, end_date_groups, end_date):
+        """
+        Calculates the quantity and weight of cattle for the group based on the provided start and end date groups.
 
-        self.start_date_count = len(start_date_groups[self.group_name])
-        self.end_date_count = len(end_date_groups[self.group_name])
-        self.count_difference = self.end_date_count - self.start_date_count
+        :param end_date: The end date for the period of calculation.
+        :param start_date_groups: A dictionary containing the group data organized by group name for the start date.
+        :param end_date_groups: A dictionary containing the group data organized by group name for the end date.
+        """
+        start_date_list = start_date_groups.get(self.group_name, [])
+        end_date_list = end_date_groups.get(self.group_name, [])
 
-    def weight_in_groups_by_date(self, start_date_groups, end_date_groups):
-        start_date_group_data = start_date_groups.get(self.group_name, [])
-        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_group_data), 2)
+        start_date_filtered = [cattle for cattle in start_date_list if cattle]
 
-        end_date_group_data = end_date_groups.get(self.group_name, [])
-        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_group_data), 2)
+        end_date_filtered = [cattle for cattle in end_date_list if (cattle['cattle']['end_date'] is None or
+                                                                    cattle['cattle']['end_date'] >= end_date)]
+
+        self.start_date_count = len(start_date_filtered)
+        self.end_date_count = len(end_date_filtered)
+
+        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_filtered), 2)
+        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_filtered), 2)
 
         self.weight_difference = round((self.end_date_group_weight - self.start_date_group_weight), 2)
 
     def acquisition_loss(self, start_date, end_date):
+        """
+        Calculates the acquisition and loss statistics of the group based on the provided start and end dates.
 
+        The weight in the acquisition or loss column will be estimated based on the acquisition date for the acquisition
+        methods and the end date for the loss methods.
+
+        :param start_date: The start date for the acquisition/loss calculation.
+        :param end_date: The end date for the acquisition/loss calculation.
+        """
         self.filter_acquisition_loss_dates = [
             cattle for cattle in self.group_data
             if (
@@ -66,34 +97,48 @@ class GroupNumbers:
 
         for item in self.filter_acquisition_loss_dates:
             cattle = item['cattle']
-            weight = item['weight']
+
+            entry_weight = 0
+            entry_count = 0
+            if cattle['entry_date'] >= start_date:
+                entry_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['entry_date']), 2)
+                entry_count = 1
+
+            end_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['end_date']), 2) if \
+                cattle['end_date'] is not None and cattle['end_date'] >= start_date else 0
 
             if 'acquisition_method' in cattle:
                 if cattle['acquisition_method'] == 'Birth':
                     self.birth_count += 1
-                    self.birth_weight += weight
+                    self.birth_weight += entry_weight
                 elif cattle['acquisition_method'] == 'Purchase':
-                    self.purchase_count += 1
-                    self.purchase_weight += weight
+                    self.purchase_count += entry_count
+                    self.purchase_weight += entry_weight
                 elif cattle['acquisition_method'] == 'Gift':
-                    self.gift_count += 1
-                    self.gift_weight += weight
+                    self.gift_count += entry_count
+                    self.gift_weight += entry_weight
 
             if 'loss_method' in cattle:
                 if cattle['loss_method'] == 'Death':
                     self.death_count += 1
-                    self.death_weight += weight
+                    self.death_weight += end_weight
                 elif cattle['loss_method'] == 'Sold':
                     self.sold_count += 1
-                    self.sold_weight += weight
+                    self.sold_weight += end_weight
                 elif cattle['loss_method'] == 'Consumed':
                     self.consumed_count += 1
-                    self.consumed_weight += weight
+                    self.consumed_weight += end_weight
                 elif cattle['loss_method'] == 'Gifted':
                     self.gifted_count += 1
-                    self.gifted_weight += weight
+                    self.gifted_weight += end_weight
 
     def check_movement(self, start_date_groups, end_date_groups):
+        """
+        Checks the movement of the group by comparing the start and end date groups.
+
+        :param start_date_groups: The dictionary of start date groups.
+        :param end_date_groups: The dictionary of end date groups.
+        """
         start_date_list = start_date_groups.get(self.group_name, [])
         end_date_list = end_date_groups.get(self.group_name, [])
 
@@ -112,6 +157,13 @@ class GroupNumbers:
         self.weight_moved_out = round(sum(item.get('weight', 0) for item in moved_out), 2)
 
     def to_dict(self, start_date=None, end_date=None):
+        """
+        Converts the GroupNumbers instance to a dictionary representation.
+
+        :param start_date: The optional start date for inclusion in the dictionary.
+        :param end_date: The optional end date for inclusion in the dictionary.
+        :return: The dictionary representation of the GroupNumbers instance.
+        """
         data = {
             'group_name': self.group_name,
             'group_data': self.group_data,
@@ -150,6 +202,10 @@ class GroupNumbers:
 
 
 class CattleGroupData:
+    """
+    Represents a group of cattle data with various properties and calculations.
+    """
+
     def __init__(self, group_name, group_data):
         self.group_name = group_name
         self.group_data = group_data
@@ -166,6 +222,9 @@ class CattleGroupData:
         self.active_cattle = 0
 
     def cattle_data(self):
+        """
+        Extracts the cattle data from the group data and assigns it to the instance properties.
+        """
         for cattle_data in self.group_data:
             if cattle_data['cattle']['end_date'] is not None:
                 self.id = cattle_data['cattle']['id']
@@ -180,27 +239,45 @@ class CattleGroupData:
                 self.comments = cattle_data['cattle']['comments']
 
     def count_active_cattle(self):
+        """
+        Counts the number of active cattle in the group.
+
+        The active cattle are those whose 'end_date' is None in the group data.
+        """
         print(self.group_data)
         self.active_cattle = sum(
             1 for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None)
 
 
 class GroupsManagement:
+    """
+    Manages groups of cattle and performs calculations on the groups.
+    """
+
     def __init__(self):
+        """
+        Initializes a GroupsManagement instance with an empty list of groups.
+        """
         self.groups: list[GroupNumbers] = []
 
     def calculate_groups(self, estimation_date):
+        """
+        Calculates the groups of cattle based on the provided estimation date.
+
+        :param estimation_date: The estimation date for the calculation.
+        :return: A dictionary containing the calculated groups of cattle.
+        """
         cattle_list = list(Cattle.objects.filter(deleted=False).values())
         groups = {
             'Cows': [{'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
                      for cattle in cattle_list if cattle['gender'] == 'Cow'
                      and cattle['entry_date'] <= estimation_date],
 
-            'Calves': [
-                {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
-                for cattle in cattle_list if cattle['gender'] in ['Heifer', 'Bull']
-                and 0 <= self.calculate_age(cattle['birth_date'], estimation_date) < 12
-                and cattle['entry_date'] <= estimation_date],
+            'Calves': [{'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'],
+                                                                                      estimation_date), 2)} for cattle
+                       in cattle_list if cattle['gender'] in ['Heifer', 'Bull']
+                       and 0 <= self.calculate_age(cattle['birth_date'], estimation_date) < 12
+                       and cattle['entry_date'] <= estimation_date],
 
             'Young_Heifer': [
                 {'cattle': cattle, 'weight': round(self.estimate_cattle_weight(cattle['id'], estimation_date), 2)}
@@ -230,32 +307,24 @@ class GroupsManagement:
         return groups
 
     def add_group(self, group_name, estimation_date):
+        """
+        Adds a group with the provided group name to the groups list based on the estimation date.
+
+        :param group_name: The name of the group to add.
+        :param estimation_date: The estimation date for the group calculation.
+        """
         groups = self.calculate_groups(estimation_date)
         group_data = groups.get(group_name, {})
         self.groups[group_name] = group_data
 
-    # Explanation:
-    #
-    # The add_group method takes two parameters: group_name and estimation_date.
-    #
-    # These parameters are used to calculate the groups using the calculate_groups method.
-    #
-    # groups variable is assigned the dictionary of groups returned by the calculate_groups method.
-    #
-    # group_data is initialized as an empty list using the get method on the 'groups' dictionary. If the group_name
-    # exists in the dictionary, it will return the corresponding list of cattle; otherwise, it will return an empty
-    # list.
-    #
-    # Finally, the group_data list is appended to the self.groups list, which keeps track of all the groups created.
-    # Note: Make sure that the GroupNumbers class is defined and imported correctly to use it as the type hint for
-    # the self.groups attribute.
-
-    # def add_group2(self, group_name, estimation_date):
-    #     groups = self.calculate_groups(estimation_date)
-    #     group_data = groups.get(group_name, [])
-    #     self.groups.append(group_data)
-
     def calculate_age(self, birth_date, estimation_date):
+        """
+        Calculates the age in months based on the birthdate and estimation date.
+
+        :param birth_date: The birthdate of the cattle.
+        :param estimation_date: The estimation date for the calculation.
+        :return: The age in months.
+        """
         if estimation_date < birth_date:
             return -1
         else:
@@ -264,6 +333,13 @@ class GroupsManagement:
             return age_in_months
 
     def estimate_cattle_weight(self, cattle_id, estimation_date):
+        """
+        Estimates the weight of cattle based on its ID and the estimation date.
+
+        :param cattle_id: The ID of the cattle.
+        :param estimation_date: The estimation date for the weight calculation.
+        :return: The estimated weight of the cattle.
+        """
         cattle = Cattle.objects.get(id=cattle_id)
         birth_date = cattle.birth_date
 
@@ -280,4 +356,10 @@ class GroupsManagement:
         else:
             raise ValueError("Invalid gender. Must be 'Heifer', 'Cow', or 'Bull'.")
 
-        return weight
+        # Check if end_date is None and return the weight without modification
+        if cattle.end_date is None:
+            return weight
+
+        # Perform the weight calculation based on the end_date
+        end_weight = weight + ((estimation_date - cattle.end_date).days * DAILY_WEIGHT_GAIN)
+        return min(end_weight, weight)

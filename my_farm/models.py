@@ -2,6 +2,9 @@ from django.db import models
 
 
 class BaseModel(models.Model):
+    """
+    A base abstract model that provides a default manager and serves as a template for other models.
+    """
     objects = models.Manager()
 
     class Meta:
@@ -9,11 +12,23 @@ class BaseModel(models.Model):
 
 
 class CattleManager(models.Manager):
+    """
+    Custom manager for the Cattle model that filters out deleted cattle objects from the queryset.
+    """
+
     def get_queryset(self):
+        """
+        Get the queryset for cattle objects with the 'deleted' field set to False.
+
+        :return: A queryset containing cattle objects with 'deleted' set to False.
+        """
         return super().get_queryset().filter(deleted=False)
 
 
 class Cattle(models.Model):
+    """
+    Represents information about cattle, including breed, gender, acquisition method, and loss method.
+    """
 
     BREED = [
         ('Angus', 'Angus'),
@@ -55,20 +70,31 @@ class Cattle(models.Model):
     picture = models.ImageField(upload_to='cattle_pictures', blank=True, null=True)
 
     def delete(self):
+        """
+        Soft delete the cattle by setting the 'deleted' field to True and saving the object.
+        """
         self.deleted = True
         self.save()
 
     class Meta:
+        """
+        Meta information for the Cattle model, including the human-readable names and default ordering.
+        """
         verbose_name = "Cattle Info"
         verbose_name_plural = "Cattle Info"
         ordering = ['name']
 
     def __str__(self):
+        """
+        Returns a string representation of the cattle object, showing its name, gender, and birthdate.
+        """
         return f'{self.name},  {self.gender}, {self.birth_date}'
 
 
 class Field(models.Model):
-
+    """
+    Represents information about a field, including its name, location, and size.
+    """
     SIZE_CHOICES = [
             ('ha', 'Hectares'),
             ('ac', 'Acres'),
@@ -85,10 +111,16 @@ class Field(models.Model):
     picture = models.ImageField(upload_to='field_pictures', blank=True, null=True)
 
     def __str__(self):
+        """
+        Returns a string representation of the field object, showing its name.
+        """
         return self.name
 
 
 class Herd(models.Model):
+    """
+    Represents information about a herd, including its name, location, and start date.
+    """
     name = models.CharField(max_length=80, blank=False)
     location = models.CharField(max_length=100, blank=False)
     field = models.ForeignKey('Field', on_delete=models.SET_NULL, blank=True, null=True, related_name='field_herds')
@@ -96,15 +128,20 @@ class Herd(models.Model):
     start_date = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     herd_leader = models.ForeignKey('Cattle', on_delete=models.SET_NULL, blank=True, null=True,
-                                        related_name='herd_leader')
+                                    related_name='herd_leader')
     picture = models.ImageField(upload_to='herd_pictures', blank=True, null=True)
 
     def __str__(self):
+        """
+        Returns a string representation of the herd object, showing its name.
+        """
         return self.name
 
 
-
 class CattleMovementReport(models.Model):
+    """
+    Represents a report of cattle movement, including detailed data and its generation date.
+    """
     title = models.CharField(max_length=100)
     generated_date = models.DateTimeField(auto_now_add=True)
     report_data = models.JSONField()

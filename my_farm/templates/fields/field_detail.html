@@ -16,9 +16,14 @@
                     {% else %}
                         No picture available.
                     {% endif %}
-                    <a href="{% url 'my_farm:upload_field_picture' field_id=field.id %}">Upload Picture</a>
+                    <a >Upload Picture</a>
                 </td>
             </tr>
+            <tr>
+                <th class="field-detail"></th>
+                <td>
+                <a href="{% url 'my_farm:upload_field_picture' field_id=field.id %}">Upload Picture</a>
+                </td>
             <tr>
                 <th class="field-detail">Name</th>
                 <td>{{ field.name }}</td>

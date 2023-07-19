@@ -27,11 +27,11 @@ def home(request):
 
     total_cattle_count = 0
     for group_data in today_groups.values():
-        alive_cows_in_group = 0  # Initialize a counter for alive cows in the group
+        alive_cows_in_group = 0
         for cattle_data in group_data:
-            if cattle_data['cattle']['end_date'] is None:  # Check if cattle is still active
-                alive_cows_in_group += 1  # Increment the counter for each active cattle
-        total_cattle_count += alive_cows_in_group  # Add the count of active cattle in the group to the total count
+            if cattle_data['cattle']['end_date'] is None:
+                alive_cows_in_group += 1
+        total_cattle_count += alive_cows_in_group
 
     groups = []
     for group_name, cattle_data in today_groups.items():

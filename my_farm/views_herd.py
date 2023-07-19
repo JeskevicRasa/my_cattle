@@ -24,7 +24,11 @@ def herd_list(request):
         filter=Q(cattle__deleted=False, cattle__loss_method__isnull=True)
     )
 
+    is_active = request.GET.get('is_active')
+
     herds = Herd.objects.annotate(count_cattle=cattle_count_query)
+    if is_active == 'True':
+        herds = herds.filter(is_active=True)
 
     paginator = Paginator(herds, 5)
     page_number = request.GET.get('page')
@@ -46,29 +50,20 @@ def add_herd(request):
         if form.is_valid():
             herd = form.save(commit=False)
 
-            # Save the herd without assigning cattle and herd leader initially
             herd.save()
-
-            # Update the selected cattle with the herd id
-            cattle_ids = request.POST.getlist('cattle')
-            if cattle_ids:
-                for cattle_id in cattle_ids:
-                    cattle = Cattle.objects.get(id=cattle_id).filter(deleted=False, loss_method__isnull=True)
-                    cattle.herd = herd
-                    cattle.save()
 
             herd_leader_id = request.POST.get('herd_leader')
             if herd_leader_id:
-                herd_leader = Cattle.objects.get(id=herd_leader_id).filter(deleted=False, loss_method__isnull=True)
-                herd.herd_leader = herd_leader
-                herd.save()
+                herd_leader = Cattle.objects.filter(id=herd_leader_id, deleted=False, loss_method__isnull=True).first()
+                if herd_leader:
+                    herd.herd_leader = herd_leader
+                    herd.save()
 
             return redirect('my_farm:herd_list')
     else:
         form = HerdForm()
 
-    # Pass the cattle queryset to the template context
-    cattle_queryset = Cattle.objects.all()
+    cattle_queryset = Cattle.objects.filter(deleted=False, loss_method__isnull=True)
 
     return render(request, 'herd/add_herd.html', {'form': form, 'cattle_queryset': cattle_queryset})
 

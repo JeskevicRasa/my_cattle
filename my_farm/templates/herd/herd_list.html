@@ -63,19 +63,29 @@
     </table>
   </div>
 
-  <div class="pagination">
-    {% if page_obj.has_previous %}
-      <a href="?page=1" class="page-link">&laquo; First</a>
-      <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&lsaquo; Previous</a>
-    {% endif %}
+{% if page_obj.has_other_pages %}
+<div class="pagination justify-content-center">
+  {% if page_obj.has_previous %}
+  <a href="?page=1" class="page-link">&laquo; First</a>
+  <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&lsaquo; Previous</a>
+  {% endif %}
 
-    <span class="current-page">{{ page_obj.number }}</span>
+  {% for num in page_obj.paginator.page_range %}
+  {% if page_obj.number == num %}
+  <a href="?page={{ num }}" class="page-link active">{{ num }}</a>
+  {% else %}
+  <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+  {% endif %}
+  {% endfor %}
 
-    {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next &rsaquo;</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
-    {% endif %}
-  </div>
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next &rsaquo;</a>
+  <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
+  {%endif %}
+</div>
+
+{% endif %}
+
 
 
 {% endblock %}

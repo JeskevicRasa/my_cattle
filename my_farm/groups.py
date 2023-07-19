@@ -221,22 +221,34 @@ class CattleGroupData:
         self.comments = None
         self.active_cattle = 0
 
+
     def cattle_data(self):
         """
         Extracts the cattle data from the group data and assigns it to the instance properties.
         """
-        for cattle_data in self.group_data:
-            if cattle_data['cattle']['end_date'] is not None:
-                self.id = cattle_data['cattle']['id']
-                self.type = cattle_data['cattle']['type']
-                self.number = cattle_data['cattle']['number']
-                self.name = cattle_data['cattle']['name']
-                self.gender = cattle_data['cattle']['gender']
-                self.breed = cattle_data['cattle']['breed']
-                self.birth_date = cattle_data['cattle']['birth_date']
-                self.acquisition_method = cattle_data['cattle']['acquisition_method']
-                self.entry_date = cattle_data['cattle']['entry_date']
-                self.comments = cattle_data['cattle']['comments']
+        filtered_cattle_data = [cattle_data for cattle_data in self.group_data if
+                                cattle_data['cattle']['end_date'] is None or cattle_data['cattle']['end_date'] == '']
+        self.cattle_data = []
+        for cattle_data in filtered_cattle_data:
+            cattle_entry = cattle_data['cattle']
+            self.cattle_data.append({
+                'id': cattle_entry['id'],  # Include the 'id' field
+                'type': cattle_entry['type'],
+                'number': cattle_entry['number'],
+                'name': cattle_entry['name'],
+                'gender': cattle_entry['gender'],
+                'breed': cattle_entry['breed'],
+                'birth_date': cattle_entry['birth_date'],
+                'acquisition_method': cattle_entry['acquisition_method'],
+                'entry_date': cattle_entry['entry_date'],
+                'comments': cattle_entry['comments'],
+            })
+
+    def get_cattle_data(self):
+        """
+        Returns the filtered cattle data for use in the template.
+        """
+        return self.cattle_data
 
     def count_active_cattle(self):
         """
@@ -244,7 +256,6 @@ class CattleGroupData:
 
         The active cattle are those whose 'end_date' is None in the group data.
         """
-        print(self.group_data)
         self.active_cattle = sum(
             1 for cattle_data in self.group_data if cattle_data['cattle']['end_date'] is None)
 

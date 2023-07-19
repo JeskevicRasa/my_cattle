@@ -1,11 +1,14 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import DeleteView
+
 from my_cattle.forms import GenderForm, CattleForm
 from my_farm.models import Cattle, Herd
+
 
 
 def cattle_info(request):
@@ -23,8 +26,7 @@ def cattle_info(request):
     if query_loss_method_null:
         cattle = cattle.filter(loss_method__isnull=True)
 
-    paginator = Paginator(cattle, 5)
-
+    paginator = Paginator(cattle, 4)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -57,13 +59,14 @@ def cattle_info(request):
             selected_fields = [column_dict[column] for column in selected_columns]
 
             cattle = cattle.values(*selected_fields)
-
         else:
             error_message = 'Please select at least one column to display.'
-            return render(request, 'my_farm/cattle_info.html',
-                          {'cattle': cattle, 'columns': all_columns, 'error_message': error_message})
+            context['error_message'] = error_message
+
     else:
         cattle = cattle.values()
+        context['selected_columns'] = all_columns
+
 
     return render(request, 'cattle/cattle_info.html', context)
 
@@ -183,59 +186,21 @@ def upload_cattle_picture(request, cattle_id):
 
 
 class CattleDeleteView(DeleteView):
-    """
-    This class is responsible for deleting a cattle object. It inherits from the DeleteView class provided
-    by the Django framework. Upon deletion, it redirects to the cattle_info page.
-
-    """
     model = Cattle
     template_name = 'cattle/cattle_confirm_delete.html'  # Update with the appropriate template name
     success_url = reverse_lazy('my_farm:cattle_info')  # Updated URL pattern name
 
-    def __init__(self, *args, **kwargs):
-        """
-        Initializes the object.
-
-        :param args: Additional positional arguments.
-        :param kwargs: Additional keyword arguments.
-        """
-        super().__init__(args, kwargs)
-        self.object = None
-
     def get_object(self, queryset=None):
-        """
-        Retrieves the cattle object to be deleted. If the cattle object is already marked as deleted,
-        it raises an Http404 exception.
-
-        :param queryset: The queryset from which to retrieve the cattle object (default: None).
-        :return: The cattle object to be deleted.
-        :raises Http404: If the cattle object is already deleted.
-        """
         obj = super().get_object(queryset=queryset)
         if obj.deleted:
             raise Http404("The cattle does not exist.")
         return obj
 
     def post(self, request, *args, **kwargs):
-        """
-        Handles the HTTP POST request for deleting the cattle object.
-        It calls the delete() method on the cattle object and redirects to the success_url.
-
-        :param request: The HTTP request object.
-        :param args: Additional positional arguments.
-        :param kwargs: Additional keyword arguments.
-        :return: The HTTP response redirecting to the success_url.
-        """
         self.object = self.get_object()
-        self.object.delete()
+        self.object.delete()  # Call the delete method
         return HttpResponseRedirect(self.get_success_url())
 
 
 def delete_confirmation_page(request):
-    """
-    Renders the confirmation_page.html template.
-
-    :param request: The HTTP request object.
-    :return: The rendered confirmation page.
-    """
     return render(request, 'cattle/confirmation_page.html')

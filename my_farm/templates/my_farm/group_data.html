@@ -20,35 +20,35 @@
           <th class="comments">Comments</th>
         </tr>
       </thead>
-      <tbody>
-        {% for group in groups %}
-          {% for cattle in group.group_data %}
-            <tr>
-              <td>{{ cattle.cattle.type }}</td>
-              <td class="cattle-number">
-                <a href="{% url 'my_farm:cattle_detail' cattle.cattle.id %}">{{ cattle.cattle.number }}</a>
-              </td>
-              <td>{{ cattle.cattle.name }}</td>
-              <td>{{ cattle.cattle.gender }}</td>
-              <td>{{ cattle.cattle.breed }}</td>
-              <td>{{ cattle.cattle.birth_date|date:"Y-m-d" }}</td>
-              <td>{{ cattle.cattle.acquisition_method }}</td>
-              <td>{{ cattle.cattle.entry_date|date:"Y-m-d" }}</td>
-              <td>
-                <div id="comments-short-{{ cattle.cattle.id }}">{{ cattle.cattle.comments|truncatechars:20 }}</div>
-                <div id="comments-full-{{ cattle.cattle.id }}" style="display: none;">{{ cattle.cattle.comments }}</div>
-                <small>
-                  <a href="#" data-cattle-id="{{ cattle.cattle.id }}" data-action="toggle-comments" onclick="toggleComments({{ cattle.cattle.id }}); return false;" style="display: inline;">Show More</a>
-                </small>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="9">No cattle in the group.</td>
-            </tr>
-          {% endfor %}
-        {% endfor %}
-      </tbody>
+<tbody>
+  {% for group in groups %}
+    {% for cattle in group.get_cattle_data %}
+      <tr>
+        <td>{{ cattle.type }}</td>
+        <td class="cattle-number">
+          <a href="{% url 'my_farm:cattle_detail' cattle.id %}">{{ cattle.number }}</a>
+        </td>
+        <td>{{ cattle.name }}</td>
+        <td>{{ cattle.gender }}</td>
+        <td>{{ cattle.breed }}</td>
+        <td>{{ cattle.birth_date|date:"Y-m-d" }}</td>
+        <td>{{ cattle.acquisition_method }}</td>
+        <td>{{ cattle.entry_date|date:"Y-m-d" }}</td>
+        <td>
+          <div id="comments-short-{{ cattle.id }}">{{ cattle.comments|truncatechars:20 }}</div>
+          <div id="comments-full-{{ cattle.id }}" style="display: none;">{{ cattle.comments }}</div>
+          <small>
+            <a href="#" data-cattle-id="{{ cattle.id }}" data-action="toggle-comments" onclick="toggleComments({{ cattle.id }}); return false;" style="display: inline;">Show More</a>
+          </small>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="9">No cattle in the group.</td>
+      </tr>
+    {% endfor %}
+  {% endfor %}
+</tbody>
     </table>
   </div>
 

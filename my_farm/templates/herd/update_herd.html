@@ -33,13 +33,14 @@
                 <label class="form-check-label label-herd" for="{{ form.is_active.id_for_label }}">Is Active</label>
             </div>
             <div class="form-group">
-                <label for="{{ form.herd_leader.id_for_label }}" class="label-herd">Herd Leader:</label>
-                <select class="form-control" id="{{ form.herd_leader.id_for_label }}" name="{{ form.herd_leader.name }}">
-                    {% for option in form.fields.herd_leader.queryset %}
-                        <option value="{{ option.pk }}" {% if option == form.herd_leader.value %}selected{% endif %}>{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <label for="{{ form.herd_leader.id_for_label }}" class="label-herd">Herd Leader:</label>
+    <select class="form-control" id="{{ form.herd_leader.id_for_label }}" name="{{ form.herd_leader.name }}">
+        <option value="">None</option>
+        {% for option in form.fields.herd_leader.queryset %}
+            <option value="{{ option.pk }}" {% if option.pk == form.herd_leader.value.pk %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+    </select>
+</div>
             <div class="form-group">
                 <label for="{{ form.picture.id_for_label }}" class="label-herd">Picture:</label>
                 {{ form.picture }}

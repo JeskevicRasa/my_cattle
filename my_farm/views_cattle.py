@@ -9,6 +9,13 @@ from my_farm.models import Cattle, Herd
 
 
 def cattle_info(request):
+    """
+    Retrieves cattle information and handles column selection for display.
+    The cattle are paginated to display 5 cattle per page.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the cattle information displayed.
+    """
     query_loss_method_null = request.GET.get('query_loss_method_null')
 
     cattle = Cattle.objects.filter(deleted=False)
@@ -16,7 +23,7 @@ def cattle_info(request):
     if query_loss_method_null:
         cattle = cattle.filter(loss_method__isnull=True)
 
-    paginator = Paginator(cattle, 6)  # Show 3 cattle per page
+    paginator = Paginator(cattle, 5)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -24,9 +31,7 @@ def cattle_info(request):
     context = {
         'cattle': page_obj,
     }
-    # print(context)
 
-    # Get a list of all the columns in the Cattle model
     all_columns = ['ID', 'Type', 'Number', 'Name', 'Gender', 'Breed', 'Birth Date',
                    'Acquisition Method', 'Entry Date', 'Loss Method', 'End Date', 'Comments']
 
@@ -34,7 +39,6 @@ def cattle_info(request):
         selected_columns = request.POST.getlist('columns')
 
         if len(selected_columns) > 0:
-            # Build a dictionary of column names and their corresponding database field names
             column_dict = {
                 'ID': 'id',
                 'Type': 'type',
@@ -50,18 +54,14 @@ def cattle_info(request):
                 'Comments': 'comments'
             }
 
-            # Build a list of the selected database field names
             selected_fields = [column_dict[column] for column in selected_columns]
 
-            # Filter the queryset to only include the selected fields
             cattle = cattle.values(*selected_fields)
 
         else:
-            # If no columns were selected, display an error message
             error_message = 'Please select at least one column to display.'
             return render(request, 'my_farm/cattle_info.html',
                           {'cattle': cattle, 'columns': all_columns, 'error_message': error_message})
-    # If the form has not been submitted, display all columns by default
     else:
         cattle = cattle.values()
 
@@ -69,6 +69,13 @@ def cattle_info(request):
 
 
 def search_cattle(request):
+    """
+    Performs a search query on the Cattle model based on the provided query parameter.
+    It filters the cattle_list based on various fields and renders the search_cattle.html template.
+
+    :param request: The HTTP request object.
+    :return: The rendered search_cattle page with the filtered cattle_list and query parameter as context.
+    """
     query = request.GET.get('query')
     if query:
         cattle_list = Cattle.objects.filter(deleted=False).filter(
@@ -95,32 +102,45 @@ def search_cattle(request):
 
 
 def add_cattle(request):
+    """
+    Adds a new row to the cattle table based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     if request.method == 'POST':
         form = GenderForm(request.POST, request.FILES)
         if form.is_valid():
             cattle = form.save(commit=False)
-            herd_id = request.POST.get('herd')  # Get the selected herd ID from the POST data
-            herd = Herd.objects.get(id=herd_id)  # Retrieve the corresponding herd object
-            cattle.herd = herd  # Assign the herd to the cattle object
-            cattle.save()  # Save the cattle object
+            herd_id = request.POST.get('herd')
+            herd = Herd.objects.get(id=herd_id)
+            cattle.herd = herd
+            cattle.save()
             return redirect('my_farm:cattle_info')
     else:
         form = GenderForm()
-    herd_queryset = Herd.objects.all()  # Retrieve all herd objects
+    herd_queryset = Herd.objects.all()
     return render(request, 'cattle/add_cattle.html', {'form': form, 'herd_queryset': herd_queryset})
 
 
 def update_cattle(request, cattle_id=None):
+    """
+    Updates the information of a specific cattle based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to be updated.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
 
     if request.method == 'POST':
         form = CattleForm(request.POST, request.FILES, instance=cattle)
         if form.is_valid():
             cattle = form.save(commit=False)
-            herd_id = request.POST.get('herd')  # Get the selected herd ID from the POST data
-            herd = Herd.objects.get(id=herd_id)  # Retrieve the corresponding herd object
-            cattle.herd = herd  # Assign the herd to the cattle object
-            cattle.save()  # Save the cattle object
+            herd_id = request.POST.get('herd')
+            herd = Herd.objects.get(id=herd_id)
+            cattle.herd = herd
+            cattle.save()
             return redirect('my_farm:cattle_detail', cattle_id=cattle_id)
     else:
         form = CattleForm(instance=cattle)
@@ -130,11 +150,25 @@ def update_cattle(request, cattle_id=None):
 
 
 def cattle_detail(request, cattle_id=None):
+    """
+    Displays detailed information about a specific cattle.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to display information about.
+    :return: The rendered HTTP response with the cattle information.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id) if cattle_id else None
     return render(request, 'cattle/cattle_detail.html', {'cattle': cattle})
 
 
 def upload_cattle_picture(request, cattle_id):
+    """
+    Handles the uploading of a picture for a specific cattle.
+
+    :param request: The HTTP request object.
+    :param cattle_id: The ID of the cattle to upload a picture for.
+    :return: The rendered HTTP response with the form or a redirect to the cattle information page.
+    """
     cattle = get_object_or_404(Cattle, id=cattle_id)
 
     if request.method == 'POST':
@@ -149,22 +183,59 @@ def upload_cattle_picture(request, cattle_id):
 
 
 class CattleDeleteView(DeleteView):
+    """
+    This class is responsible for deleting a cattle object. It inherits from the DeleteView class provided
+    by the Django framework. Upon deletion, it redirects to the cattle_info page.
+
+    """
     model = Cattle
     template_name = 'cattle/cattle_confirm_delete.html'  # Update with the appropriate template name
     success_url = reverse_lazy('my_farm:cattle_info')  # Updated URL pattern name
 
+    def __init__(self, *args, **kwargs):
+        """
+        Initializes the object.
+
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+        super().__init__(args, kwargs)
+        self.object = None
+
     def get_object(self, queryset=None):
+        """
+        Retrieves the cattle object to be deleted. If the cattle object is already marked as deleted,
+        it raises an Http404 exception.
+
+        :param queryset: The queryset from which to retrieve the cattle object (default: None).
+        :return: The cattle object to be deleted.
+        :raises Http404: If the cattle object is already deleted.
+        """
         obj = super().get_object(queryset=queryset)
         if obj.deleted:
             raise Http404("The cattle does not exist.")
         return obj
 
     def post(self, request, *args, **kwargs):
+        """
+        Handles the HTTP POST request for deleting the cattle object.
+        It calls the delete() method on the cattle object and redirects to the success_url.
+
+        :param request: The HTTP request object.
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword arguments.
+        :return: The HTTP response redirecting to the success_url.
+        """
         self.object = self.get_object()
-        self.object.delete()  # Call the delete method
+        self.object.delete()
         return HttpResponseRedirect(self.get_success_url())
 
 
 def delete_confirmation_page(request):
-    return render(request, 'cattle/confirmation_page.html')
+    """
+    Renders the confirmation_page.html template.
 
+    :param request: The HTTP request object.
+    :return: The rendered confirmation page.
+    """
+    return render(request, 'cattle/confirmation_page.html')

@@ -3,6 +3,12 @@ from my_farm.models import Cattle, Herd, Field
 
 
 class GenderForm(forms.ModelForm):
+    """
+    Form for updating gender-related information of cattle.
+
+    ModelForm to handle the update of gender-related fields (gender, breed, birth date, acquisition method,
+    entry date, loss method, end date, comments, and picture) of a cattle model.
+    """
     class Meta:
         model = Cattle
         fields = ['number', 'name', 'gender', 'breed', 'birth_date', 'acquisition_method',
@@ -23,6 +29,12 @@ class GenderForm(forms.ModelForm):
 
 
 class CattleForm(forms.ModelForm):
+    """
+    Form for updating cattle information.
+
+    ModelForm to handle the update of cattle-related fields (number, name, gender, breed, birth date, acquisition method,
+    entry date, loss method, end date, comments, picture, and herd) of a cattle model.
+    """
     herd = forms.ModelChoiceField(queryset=Herd.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -45,6 +57,12 @@ class CattleForm(forms.ModelForm):
 
 
 class HerdForm(forms.ModelForm):
+    """
+    Form for updating herd information.
+
+    ModelForm to handle the update of herd-related fields (name, location, field, cattle, description, start date,
+    is_active, herd_leader, and picture) of a herd model.
+    """
     cattle = forms.ModelMultipleChoiceField(queryset=Cattle.objects.all(), required=False)
     herd_leader = forms.ModelChoiceField(queryset=Cattle.objects.all(), required=False)
 
@@ -64,6 +82,12 @@ class HerdForm(forms.ModelForm):
 
 
 class FieldForm(forms.ModelForm):
+    """
+    Form for updating field information.
+
+    ModelForm to handle the update of field-related fields (name, location, coordinates, field size, size unit, field type,
+    is_active, description, picture, and herd) of a field model.
+    """
     herd = forms.ModelMultipleChoiceField(queryset=Herd.objects.all(), required=False)
 
     class Meta:

@@ -17,6 +17,11 @@
                     {% else %}
                         No picture available.
                     {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="cattle-detail"></th>
+                <td>
                     <a href="{% url 'my_farm:upload_cattle_picture' cattle_id=cattle.id %}">Upload Picture</a>
                 </td>
             </tr>

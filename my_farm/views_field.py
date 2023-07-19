@@ -7,12 +7,19 @@ from .models import Field, Herd
 
 def field_list(request):
     is_active = request.GET.get('is_active')
+    """
+    Retrieves field information and displays the list of fields.
+    The fields are paginated to display 5 fields per page.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the field information displayed.
+    """
     fields = Field.objects.annotate(count_herd=Count('field_herds'))
 
     if is_active == 'True':
         fields = fields.filter(is_active=True)
 
-    paginator = Paginator(fields, 3)
+    paginator = Paginator(fields, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -20,6 +27,12 @@ def field_list(request):
 
 
 def add_field(request):
+    """
+    Adds a new row to the field table based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :return: The rendered HTTP response with the form or a redirect to the field list page.
+    """
     if request.method == 'POST':
         form = FieldForm(request.POST, request.FILES)
         if form.is_valid():
@@ -27,7 +40,6 @@ def add_field(request):
             herd_ids = request.POST.getlist('herd')
             herds = Herd.objects.filter(id__in=herd_ids)
 
-            # Allocate herds to the newly created field
             for herd in herds:
                 herd.field = field
                 herd.save()
@@ -36,13 +48,19 @@ def add_field(request):
     else:
         form = FieldForm()
 
-    # Retrieve the herd_queryset
     herd_queryset = Herd.objects.all()
 
     return render(request, 'fields/add_field.html', {'form': form, 'herd_queryset': herd_queryset})
 
 
 def update_field(request, field_id):
+    """
+    Updates the information of a specific field based on the submitted form data.
+
+    :param request: The HTTP request object.
+    :param field_id: The ID of the herd to be updated.
+    :return: The rendered HTTP response with the form or a redirect to the field list page.
+    """
     field = get_object_or_404(Field, id=field_id) if field_id else None
 
     if request.method == 'POST':
@@ -58,6 +76,13 @@ def update_field(request, field_id):
 
 
 def field_detail(request, field_id=None):
+    """
+    Displays detailed information about a specific field.
+
+    :param request: The HTTP request object.
+    :param field_id: The ID of the field to display information about.
+    :return: The rendered HTTP response with the field information.
+    """
     field = get_object_or_404(Field, id=field_id) if field_id else None
 
     if field:
@@ -67,6 +92,13 @@ def field_detail(request, field_id=None):
 
 
 def upload_field_picture(request, field_id):
+    """
+    Handles the uploading of a picture for a specific field.
+
+    :param request: The HTTP request object.
+    :param field_id: The ID of the field to upload a picture for.
+    :return: The rendered HTTP response with the form or a redirect to the field list page.
+    """
     field = get_object_or_404(Field, id=field_id)
 
     if request.method == 'POST':
@@ -81,8 +113,19 @@ def upload_field_picture(request, field_id):
 
 
 def herd_list_by_field(request, field_id):
+    """
+    Retrieves the list of herds belonging to a specific field.
+    Filters the cattle_list based on the specified field ID.
+    The cattle_list is then rendered using the cattle_list_by_herd.html template.
+
+    :param request: The HTTP request object.
+    :param field_id: The ID of the field for which to retrieve the herds list.
+    :return: The rendered herd_list_by_field page with the field and herd_list as context.
+    """
     field = get_object_or_404(Field, id=field_id)
-    herd_list = Herd.objects.filter(field=field).annotate(count_cattle=Count('cattle'))
+    herd_list = Herd.objects.filter(field=field).annotate(
+        count_cattle=Count('cattle', filter=Q(cattle__deleted=False, cattle__loss_method__isnull=True))
+    )
 
     return render(request, 'fields/herd_list_by_field.html', {'field': field, 'herd_list': herd_list})
 

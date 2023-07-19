@@ -1,11 +1,4 @@
 from datetime import date
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Herd, Field
-from django.urls import reverse
-from .groups import GroupsManagement, GroupNumbers, CattleGroupData
-import json
-from django.utils import timezone
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render

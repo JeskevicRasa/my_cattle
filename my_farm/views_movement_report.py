@@ -1,7 +1,6 @@
 from datetime import date, datetime
 from django.shortcuts import render, redirect
 from django.views import View
-from django.urls import reverse
 from .constants import MAX_REPORTS
 from .groups import GroupsManagement, GroupNumbers
 import json

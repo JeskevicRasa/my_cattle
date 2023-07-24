@@ -17,8 +17,7 @@ def herd_list(request):
     :return: The rendered HTTP response with the herd information displayed.
 
     """
-    herds = Herd.objects.annotate(count_cattle=Count('cattle', filter=Q(cattle__deleted=False,
-                                                                        cattle__loss_method__isnull=True)))
+
     cattle_count_query = Count(
         'cattle',
         filter=Q(cattle__deleted=False, cattle__loss_method__isnull=True)

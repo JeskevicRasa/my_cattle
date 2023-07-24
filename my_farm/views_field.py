@@ -6,7 +6,6 @@ from .models import Field, Herd
 
 
 def field_list(request):
-    is_active = request.GET.get('is_active')
     """
     Retrieves field information and displays the list of fields.
     The fields are paginated to display 5 fields per page.
@@ -14,6 +13,7 @@ def field_list(request):
     :param request: The HTTP request object.
     :return: The rendered HTTP response with the field information displayed.
     """
+    is_active = request.GET.get('is_active')
     fields = Field.objects.annotate(count_herd=Count('field_herds'))
 
     if is_active == 'True':
@@ -66,7 +66,7 @@ def update_field(request, field_id):
     if request.method == 'POST':
         form = FieldForm(request.POST, request.FILES, instance=field)
         if form.is_valid():
-            updated_field = form.save()
+            form.save()
 
             return redirect('my_farm:field_detail', field_id=field_id)
     else:
@@ -131,6 +131,13 @@ def herd_list_by_field(request, field_id):
 
 
 def search_field(request):
+    """
+    Performs a search query on the Field model based on the provided query parameter.
+    It filters the field_list based on various fields and renders the search_field.html template.
+
+    :param request: The HTTP request object.
+    :return: The rendered search_field page with the filtered field_list and query parameter as context.
+    """
     query = request.GET.get('query')
 
     if query:

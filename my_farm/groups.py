@@ -51,10 +51,11 @@ class GroupNumbers:
         """
         return self.group_name
 
-    def quantity(self, start_date_groups, end_date_groups, end_date):
+    def quantity(self, start_date_groups, end_date_groups, start_date, end_date):
         """
         Calculates the quantity and weight of cattle for the group based on the provided start and end date groups.
 
+        :param start_date: The start date for the period of calculation.
         :param end_date: The end date for the period of calculation.
         :param start_date_groups: A dictionary containing the group data organized by group name for the start date.
         :param end_date_groups: A dictionary containing the group data organized by group name for the end date.
@@ -62,7 +63,8 @@ class GroupNumbers:
         start_date_list = start_date_groups.get(self.group_name, [])
         end_date_list = end_date_groups.get(self.group_name, [])
 
-        start_date_filtered = [cattle for cattle in start_date_list if cattle]
+        start_date_filtered = [cattle for cattle in start_date_list if (cattle['cattle']['end_date'] is None or
+                                                                        cattle['cattle']['end_date'] >= start_date)]
 
         end_date_filtered = [cattle for cattle in end_date_list if (cattle['cattle']['end_date'] is None or
                                                                     cattle['cattle']['end_date'] >= end_date)]
@@ -70,10 +72,12 @@ class GroupNumbers:
         self.start_date_count = len(start_date_filtered)
         self.end_date_count = len(end_date_filtered)
 
-        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_filtered), 2)
-        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_filtered), 2)
+        self.count_difference = self.end_date_count - self.start_date_count
 
-        self.weight_difference = round((self.end_date_group_weight - self.start_date_group_weight), 2)
+        self.start_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in start_date_filtered))
+        self.end_date_group_weight = round(sum(cattle_dict['weight'] for cattle_dict in end_date_filtered))
+
+        self.weight_difference = round((self.end_date_group_weight - self.start_date_group_weight))
 
     def acquisition_loss(self, start_date, end_date):
         """
@@ -98,24 +102,19 @@ class GroupNumbers:
         for item in self.filter_acquisition_loss_dates:
             cattle = item['cattle']
 
-            entry_weight = 0
-            entry_count = 0
-            if cattle['entry_date'] >= start_date:
-                entry_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['entry_date']), 2)
-                entry_count = 1
-
-            end_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['end_date']), 2) if \
-                cattle['end_date'] is not None and cattle['end_date'] >= start_date else 0
+            entry_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['entry_date']))
+            end_weight = round(GroupsManagement().estimate_cattle_weight(cattle['id'], cattle['end_date'])) if \
+                cattle['end_date'] is not None else 0
 
             if 'acquisition_method' in cattle:
                 if cattle['acquisition_method'] == 'Birth':
                     self.birth_count += 1
                     self.birth_weight += entry_weight
                 elif cattle['acquisition_method'] == 'Purchase':
-                    self.purchase_count += entry_count
+                    self.purchase_count += 1
                     self.purchase_weight += entry_weight
                 elif cattle['acquisition_method'] == 'Gift':
-                    self.gift_count += entry_count
+                    self.gift_count += 1
                     self.gift_weight += entry_weight
 
             if 'loss_method' in cattle:
@@ -149,12 +148,12 @@ class GroupNumbers:
         moved_in = [item for item in end_date_list if
                     item['cattle']['id'] not in [cattle['cattle']['id'] for cattle in start_date_list] and
                     item not in self.filter_acquisition_loss_dates]
-
+        print(self.filter_acquisition_loss_dates)
         self.moved_in = len(moved_in)
         self.moved_out = len(moved_out)
 
-        self.weight_moved_in = round(sum(item.get('weight', 0) for item in moved_in), 2)
-        self.weight_moved_out = round(sum(item.get('weight', 0) for item in moved_out), 2)
+        self.weight_moved_in = round(sum(item.get('weight', 0) for item in moved_in))
+        self.weight_moved_out = round(sum(item.get('weight', 0) for item in moved_out))
 
     def to_dict(self, start_date=None, end_date=None):
         """
@@ -221,34 +220,22 @@ class CattleGroupData:
         self.comments = None
         self.active_cattle = 0
 
-
     def cattle_data(self):
         """
         Extracts the cattle data from the group data and assigns it to the instance properties.
         """
-        filtered_cattle_data = [cattle_data for cattle_data in self.group_data if
-                                cattle_data['cattle']['end_date'] is None or cattle_data['cattle']['end_date'] == '']
-        self.cattle_data = []
-        for cattle_data in filtered_cattle_data:
-            cattle_entry = cattle_data['cattle']
-            self.cattle_data.append({
-                'id': cattle_entry['id'],  # Include the 'id' field
-                'type': cattle_entry['type'],
-                'number': cattle_entry['number'],
-                'name': cattle_entry['name'],
-                'gender': cattle_entry['gender'],
-                'breed': cattle_entry['breed'],
-                'birth_date': cattle_entry['birth_date'],
-                'acquisition_method': cattle_entry['acquisition_method'],
-                'entry_date': cattle_entry['entry_date'],
-                'comments': cattle_entry['comments'],
-            })
-
-    def get_cattle_data(self):
-        """
-        Returns the filtered cattle data for use in the template.
-        """
-        return self.cattle_data
+        for cattle_data in self.group_data:
+            if cattle_data['cattle']['end_date'] is not None:
+                self.id = cattle_data['cattle']['id']
+                self.type = cattle_data['cattle']['type']
+                self.number = cattle_data['cattle']['number']
+                self.name = cattle_data['cattle']['name']
+                self.gender = cattle_data['cattle']['gender']
+                self.breed = cattle_data['cattle']['breed']
+                self.birth_date = cattle_data['cattle']['birth_date']
+                self.acquisition_method = cattle_data['cattle']['acquisition_method']
+                self.entry_date = cattle_data['cattle']['entry_date']
+                self.comments = cattle_data['cattle']['comments']
 
     def count_active_cattle(self):
         """
@@ -354,7 +341,7 @@ class GroupsManagement:
         cattle = Cattle.objects.get(id=cattle_id)
         birth_date = cattle.birth_date
 
-        days_passed = (estimation_date - birth_date).days
+        days_passed = (estimation_date - birth_date).days if estimation_date > birth_date else 0
 
         gender = cattle.gender
 
@@ -367,8 +354,4 @@ class GroupsManagement:
         else:
             raise ValueError("Invalid gender. Must be 'Heifer', 'Cow', or 'Bull'.")
 
-        if cattle.end_date is None:
-            return weight
-
-        end_weight = weight + ((estimation_date - cattle.end_date).days * DAILY_WEIGHT_GAIN)
-        return min(end_weight, weight)
+        return weight

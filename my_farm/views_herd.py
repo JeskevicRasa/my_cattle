@@ -1,4 +1,3 @@
-
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
@@ -13,12 +12,13 @@ def herd_list(request):
     This view retrieves information about herds, including the number of active cattle in each herd. Only cattle that
     are not marked as deleted and have no loss method specified are counted. The herds are paginated to display 5 herds
     per page.
-    herds = Herd.objects.annotate(count_cattle=Count('cattle', filter=Q(cattle__deleted=False,
-                                                                        cattle__loss_method__isnull=True)))
 
     :param request: The HTTP request object.
     :return: The rendered HTTP response with the herd information displayed.
+
     """
+    herds = Herd.objects.annotate(count_cattle=Count('cattle', filter=Q(cattle__deleted=False,
+                                                                        cattle__loss_method__isnull=True)))
     cattle_count_query = Count(
         'cattle',
         filter=Q(cattle__deleted=False, cattle__loss_method__isnull=True)
@@ -66,6 +66,7 @@ def add_herd(request):
     cattle_queryset = Cattle.objects.filter(deleted=False, loss_method__isnull=True)
 
     return render(request, 'herd/add_herd.html', {'form': form, 'cattle_queryset': cattle_queryset})
+
 
 def update_herd(request, herd_id=None):
     """
@@ -136,6 +137,16 @@ def upload_herd_picture(request, herd_id):
 
 
 def cattle_list_by_herd(request, herd_id):
+    """
+    Retrieves the list of cattle belonging to a specific herd.
+    Filters the cattle_list based on the specified herd ID, ensuring that only
+    cattle that are not deleted and have no loss_method assigned are included.
+    The cattle_list is then rendered using the cattle_list_by_herd.html template.
+
+    :param request: The HTTP request object.
+    :param herd_id: The ID of the herd for which to retrieve the cattle list.
+    :return: The rendered cattle_list_by_herd page with the herd and cattle_list as context.
+    """
     herd = get_object_or_404(Herd, id=herd_id)
     cattle_list = Cattle.objects.filter(herd=herd, deleted=False, loss_method__isnull=True)
 

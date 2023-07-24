@@ -132,7 +132,7 @@ class LivestockMovementReportView(GroupsManagement, GenerateReportView, View):
         self.groups = []
         for group_name, cattle_data in estimation_date.items():
             group = GroupNumbers(group_name, cattle_data)
-            group.quantity(start_date_groups, end_date_groups, self.end_date)
+            group.quantity(start_date_groups, end_date_groups, self.start_date, self.end_date)
             group.acquisition_loss(self.start_date, self.end_date)
             group.check_movement(start_date_groups, end_date_groups)
             self.groups.append(group)

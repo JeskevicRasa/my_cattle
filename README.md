@@ -1,8 +1,8 @@
-# My Cattle Project
+# My Cattle - Cattle Management Web Application
 
-My Cattle Project is a web application designed to assist cattle farmers in managing their cattle, herds, and fields. 
-The project aims to provide a centralized platform for recording and accessing essential information about cattle, herds, and fields, as well as generating livestock movement reports. 
-This README provides an overview of the project, installation instructions, and usage guidelines.
+My Cattle is a web application designed to assist cattle farmers in managing their cattle, herds, and fields. The application offers a centralized platform for recording and accessing essential information about livestock and fields, as well as generating livestock movement reports.
+
+This README provides an overview of the application's features, including its installation process and usage guideline. 
 
 ## Features
 
@@ -24,19 +24,19 @@ This README provides an overview of the project, installation instructions, and 
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/JeskevicRasa/my_cattle.git
-2. Install dependencies: `pip install -r requirements.txt`
-3. Set up the database: `python manage.py migrate`
-4. Create a superuser: `python manage.py createsuperuser`
-5. Start the development server: `python manage.py runserver`
+1. Clone original project repository without deployment settings for local development and testing: `https://github.comJeskevicRasa/my_cattle'
+2. Install dependencies: pip install -r requirements.txt
+3. Set up the database - note that this is running on SQLite by default, you will have to download and install it: python manage.py migrate
+4. Create a superuser: python manage.py createsuperuser
+5. Start the development server: python manage.py runserver`
 
 ## Usage
 
-1. Access the application in your web browser at `http://localhost:8000`.
-2. Log in using your superuser account or create a new account with appropriate permissions.
-3. Add cattle information using the provided forms and interfaces.
-4. Manage cattle movements, group assignments, and other details from the user-friendly dashboard.
-5. Generate reports to analyze cattle data and make informed decisions.
+1. Access the Application: Open your web browser and navigate to http://localhost:8000.
+2. Login or Create an Account: Log in using your superuser account or create a new account.
+3. Manage Data: Use the navigation panel to access the interfaces for managing fields, herds, and cattle. Input relevant data for each section.
+4. Explore Cattle Information: After inputting data, go to the main dashboard and access cattle details by age group, active herds, and fields.
+5. Generate Reports: Create livestock movement reports to monitor changes in livestock across different age groups during selected time periods.
 
 
 Happy cattle management! 🐮
